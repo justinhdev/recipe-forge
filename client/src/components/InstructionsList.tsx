@@ -1,14 +1,12 @@
 import { motion } from "framer-motion";
+import { parseInstructions } from "../utils/parseInstructions";
 
 export default function InstructionsList({
   instructions,
 }: {
   instructions: string;
 }) {
-  const steps =
-    instructions
-      .match(/Step \d+\..*?(?=Step \d+\.|$)/g)
-      ?.map((s) => s.replace(/^Step \d+\.\s*/, "")) ?? [];
+  const steps = parseInstructions(instructions);
 
   return (
     <div className="space-y-2">

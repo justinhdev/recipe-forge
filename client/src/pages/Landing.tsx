@@ -7,8 +7,8 @@ export default function Landing() {
         Welcome to Recipe Forge
       </h1>
       <p className="max-w-xl px-2 sm:px-0 text-lg sm:text-xl mb-8 text-gray-700 dark:text-gray-300">
-        Generate delicious, healthy recipes with AI. Track your macros, save
-        favorites, and stay on top of your nutrition goals.
+        Generate healthy recipes from the ingredients you
+        have, with macros tailored to your goals.
       </p>
       <Link
         to="/login"

@@ -2,21 +2,11 @@ import MacroChart from "./MacroChart";
 import { motion } from "framer-motion";
 import { getIcon } from "../utils/getIcon";
 import { X } from "lucide-react";
-
-type Recipe = {
-  id: number;
-  title: string;
-  ingredients: string[];
-  instructions: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-  createdAt: string;
-};
+import InstructionsList from "./InstructionsList";
+import type { Recipe } from "../types/recipe";
 
 type Props = {
-  recipe: Recipe | null;
+  recipe: Required<Recipe> | null;
   onClose: () => void;
   onDelete: (id: number) => void;
 };
@@ -71,24 +61,11 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
           <p className="text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">
             Instructions:
           </p>
-          <div className="space-y-4">
-            {instructions
-              .split(/\d+\.\s*/)
-              .filter((step) => step.trim() !== "")
-              .map((step, i) => (
-                <div key={i}>
-                  <p className="font-semibold text-gray-900 dark:text-white mb-1">
-                    Step {i + 1}
-                  </p>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {step.trim()}
-                  </p>
-                </div>
-              ))}
-          </div>
+          <InstructionsList instructions={instructions} />
         </div>
 
         <MacroChart protein={protein} fat={fat} carbs={carbs} />
+
         <p className="text-xs text-center text-gray-500 dark:text-gray-400">
           {calories} kcal • {protein}g protein • {fat}g fat • {carbs}g carbs
         </p>
