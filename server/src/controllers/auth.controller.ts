@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import prisma from "../prisma";
 import { LoginUserBody, RegisterUserBody } from "../schemas/auth.schema";
+import { generateToken } from "../utils/generateToken";
 
 export const registerUser = async (
   req: Request,
@@ -22,9 +22,7 @@ export const registerUser = async (
       data: { name, email, password: hashedPassword },
     });
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = generateToken(user.id);
     res.json({ token });
   } catch (err) {
     next(err);
@@ -46,9 +44,7 @@ export const loginUser = async (
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = generateToken(user.id);
     res.json({ token });
   } catch (err) {
     next(err);

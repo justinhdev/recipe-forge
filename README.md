@@ -51,6 +51,7 @@ This project was built to strengthen hands-on experience with modern full-stack 
 - Clean `400` validation responses with field-level error details
 - OpenAI structured output parsing backed by a Zod schema before responses are returned
 - Shared frontend contract types that mirror the server request/response shapes
+- Server test coverage with Vitest and Supertest
 - Responsive frontend with loading and error states
 - Full-stack architecture with separate client and server applications
 
@@ -74,6 +75,8 @@ This project was built to strengthen hands-on experience with modern full-stack 
 - JWT authentication
 - OpenAI API
 - Zod
+- Vitest
+- Supertest
 
 ---
 
@@ -98,6 +101,7 @@ recipe-forge/
 - JWT authentication and protected routes
 - request validation with Zod middleware
 - OpenAI-powered recipe generation with structured output validation
+- automated integration and unit tests for API behavior and helper logic
 - recipe persistence with Prisma and PostgreSQL
 
 ---
@@ -118,6 +122,15 @@ recipe-forge/
 - `server/src/middleware/validate.middleware.ts` validates request bodies and params at the route layer
 - `server/src/middleware/error.middleware.ts` converts `ZodError`s into clean `400` responses
 - `client/src/types/contracts.ts` mirrors the API contracts used by the frontend
+
+### Testing flow
+
+- `server/src/test/auth.integration.test.ts` covers auth registration and login behavior
+- `server/src/test/recipes.integration.test.ts` covers authenticated recipe create/list/delete behavior
+- `server/src/test/openai.service.unit.test.ts` mocks OpenAI and tests prompt-building behavior without hitting the real API
+- `server/src/test/jwt.utils.unit.test.ts` covers JWT helper behavior
+- `server/src/test/test-env.ts` rewrites the Prisma connection to use a dedicated Postgres `test` schema
+- `server/src/test/setup.ts` runs `prisma db push` automatically and clears test data between runs
 
 ---
 
@@ -222,7 +235,17 @@ npx prisma generate
 npm run dev
 ```
 
-### 5. Start the frontend app
+### 5. Run the server tests
+
+From the `server/` directory:
+
+```bash
+npm test
+```
+
+The test suite automatically points Prisma at a separate Postgres schema named `test`, runs `prisma db push`, and clears data between tests. You do not need to create that schema manually each time, but PostgreSQL does need to be running locally.
+
+### 6. Start the frontend app
 
 In a second terminal:
 
@@ -230,14 +253,3 @@ In a second terminal:
 cd client
 npm run dev
 ```
-
----
-
-## Future Improvements
-
-- deploy the app for public demo access
-- add recipe update/edit functionality
-- add automated tests
-- add rate limiting and caching
-
----
