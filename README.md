@@ -1,5 +1,7 @@
 # Recipe Forge
 
+[![CI passing](https://github.com/justinhdev/recipe-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/justinhdev/recipe-forge/actions/workflows/ci.yml)
+
 <p align="center">
   AI-powered recipe generator built with <strong>React</strong>, <strong>TypeScript</strong>, <strong>Node.js/Express</strong>, <strong>PostgreSQL</strong>, and <strong>Prisma</strong>.
 </p>

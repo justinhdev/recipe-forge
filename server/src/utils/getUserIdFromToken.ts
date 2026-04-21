@@ -1,7 +1,13 @@
 import jwt from "jsonwebtoken";
 
-export const getUserIdFromToken = (req: any): number | null => {
-  const auth = req.headers.authorization;
+type AuthRequestLike = {
+  headers?: {
+    authorization?: string;
+  };
+};
+
+export const getUserIdFromToken = (req: AuthRequestLike): number | null => {
+  const auth = req.headers?.authorization;
   if (!auth?.startsWith("Bearer ")) return null;
 
   try {

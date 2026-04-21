@@ -11,9 +11,9 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    (req as any).user = decoded;
+    Object.assign(req, { user: decoded });
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: "Token failed" });
   }
 };
