@@ -1,10 +1,15 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../prisma";
+import { LoginUserBody, RegisterUserBody } from "../schemas/auth.schema";
 
-export const registerUser = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+export const registerUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { name, email, password } = req.body as RegisterUserBody;
 
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -22,13 +27,16 @@ export const registerUser = async (req: Request, res: Response) => {
     });
     res.json({ token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error creating user" });
+    next(err);
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, password } = req.body as LoginUserBody;
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
@@ -43,7 +51,6 @@ export const loginUser = async (req: Request, res: Response) => {
     });
     res.json({ token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Login failed" });
+    next(err);
   }
 };

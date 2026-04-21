@@ -1,6 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import type {
+  LoginUserRequest,
+  RegisterUserRequest,
+} from "../types/contracts";
 
 type Props = {
   isLogin?: boolean;
@@ -19,13 +23,15 @@ export default function AuthForm({ isLogin = false }: Props) {
       ? "http://localhost:3000/api/auth/login"
       : "http://localhost:3000/api/auth/register";
 
-    const payload = isLogin ? { email, password } : { name, email, password };
+    const payload: LoginUserRequest | RegisterUserRequest = isLogin
+      ? { email, password }
+      : { name, email, password };
 
     try {
       const res = await axios.post(url, payload);
       localStorage.setItem("token", res.data.token);
-      if (!isLogin && payload.name) {
-        localStorage.setItem("name", payload.name);
+      if (!isLogin) {
+        localStorage.setItem("name", name);
       }
       navigate("/generate");
     } catch (err: unknown) {

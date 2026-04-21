@@ -30,6 +30,7 @@ This project was built to strengthen hands-on experience with modern full-stack 
 - PostgreSQL data modeling with Prisma
 - JWT authentication and protected routes
 - integrating structured LLM outputs into an app workflow
+- runtime validation with Zod across request and response boundaries
 
 ---
 
@@ -46,6 +47,10 @@ This project was built to strengthen hands-on experience with modern full-stack 
 - JWT-based authentication
 - Save generated recipes to a user account
 - Retrieve and delete saved recipes through authenticated API endpoints
+- Zod validation for every request body and recipe ID route param
+- Clean `400` validation responses with field-level error details
+- OpenAI structured output parsing backed by a Zod schema before responses are returned
+- Shared frontend contract types that mirror the server request/response shapes
 - Responsive frontend with loading and error states
 - Full-stack architecture with separate client and server applications
 
@@ -68,6 +73,7 @@ This project was built to strengthen hands-on experience with modern full-stack 
 - PostgreSQL
 - JWT authentication
 - OpenAI API
+- Zod
 
 ---
 
@@ -90,7 +96,8 @@ recipe-forge/
 ### Backend responsibilities
 - user registration and login
 - JWT authentication and protected routes
-- OpenAI-powered recipe generation
+- request validation with Zod middleware
+- OpenAI-powered recipe generation with structured output validation
 - recipe persistence with Prisma and PostgreSQL
 
 ---
@@ -99,10 +106,18 @@ recipe-forge/
 
 1. A user selects ingredients and optional recipe preferences.
 2. The frontend sends a request to the Express API.
-3. The backend builds a prompt and sends it to the OpenAI API.
-4. The response is parsed into structured JSON.
-5. The generated recipe is returned to the frontend.
-6. Authenticated users can save recipes and manage them later.
+3. The backend validates the request body with Zod before any controller logic runs.
+4. The backend builds a prompt and sends it to the OpenAI API.
+5. The OpenAI response is parsed as structured output and validated against a Zod schema.
+6. The generated recipe is validated again against the API response shape, then returned to the frontend.
+7. Authenticated users can save recipes and manage them later.
+
+### Validation flow
+
+- `server/src/schemas/` contains the request and OpenAI response schemas
+- `server/src/middleware/validate.middleware.ts` validates request bodies and params at the route layer
+- `server/src/middleware/error.middleware.ts` converts `ZodError`s into clean `400` responses
+- `client/src/types/contracts.ts` mirrors the API contracts used by the frontend
 
 ---
 
@@ -161,6 +176,7 @@ Create a `.env` file inside the `server/` directory:
 DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-2024-08-06
 PORT=3000
 ```
 
@@ -221,10 +237,7 @@ npm run dev
 
 - deploy the app for public demo access
 - add recipe update/edit functionality
-- add schema validation for API requests and responses
 - add automated tests
-- improve error handling
 - add rate limiting and caching
-- strengthen prompt/output validation
 
 ---

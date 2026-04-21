@@ -1,8 +1,14 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getRecipeFromIngredients } from "../services/openai.service";
 import { getUserIdFromToken } from "../utils/getUserIdFromToken";
+import { GenerateRecipeBody } from "../schemas/openai.schema";
+import { recipeBodySchema } from "../schemas/recipe.schema";
 
-export const generateRecipe = async (req: Request, res: Response) => {
+export const generateRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const {
     ingredients,
     servings,
@@ -11,7 +17,7 @@ export const generateRecipe = async (req: Request, res: Response) => {
     mealType,
     bravery,
     macroPreference,
-  } = req.body;
+  } = req.body as GenerateRecipeBody;
   const userId = getUserIdFromToken(req);
 
   if (!userId) {
@@ -40,7 +46,7 @@ export const generateRecipe = async (req: Request, res: Response) => {
       macroPreference,
     });
 
-    res.json({
+    const responseBody = recipeBodySchema.parse({
       title: recipe.title,
       ingredients: recipe.ingredients,
       instructions: sanitizeInstructions(recipe.instructions),
@@ -49,8 +55,9 @@ export const generateRecipe = async (req: Request, res: Response) => {
       fat: recipe.macros.fat,
       carbs: recipe.macros.carbs,
     });
+
+    res.json(responseBody);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to generate recipe" });
+    next(err);
   }
 };

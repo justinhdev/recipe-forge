@@ -1,8 +1,13 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import prisma from "../prisma";
 import { getUserIdFromToken } from "../utils/getUserIdFromToken";
+import { RecipeBody, RecipeIdParams } from "../schemas/recipe.schema";
 
-export const getUserRecipes = async (req: Request, res: Response) => {
+export const getUserRecipes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = getUserIdFromToken(req);
 
   if (!userId) {
@@ -17,21 +22,20 @@ export const getUserRecipes = async (req: Request, res: Response) => {
 
     res.json(recipes);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch recipes" });
+    next(err);
   }
 };
 
-export const deleteRecipe = async (req: Request, res: Response) => {
+export const deleteRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = getUserIdFromToken(req);
-  const recipeId = parseInt(req.params.id);
+  const { id: recipeId } = req.params as unknown as RecipeIdParams;
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  if (isNaN(recipeId)) {
-    return res.status(400).json({ message: "Invalid recipe ID" });
   }
 
   try {
@@ -48,15 +52,18 @@ export const deleteRecipe = async (req: Request, res: Response) => {
     await prisma.recipe.delete({ where: { id: recipeId } });
     res.json({ message: "Recipe deleted successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to delete recipe" });
+    next(err);
   }
 };
 
-export const createRecipe = async (req: Request, res: Response) => {
+export const createRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = getUserIdFromToken(req);
   const { title, ingredients, instructions, calories, protein, fat, carbs } =
-    req.body;
+    req.body as RecipeBody;
 
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -78,7 +85,6 @@ export const createRecipe = async (req: Request, res: Response) => {
 
     res.status(201).json(recipe);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to save recipe" });
+    next(err);
   }
 };

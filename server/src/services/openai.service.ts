@@ -1,20 +1,19 @@
 import { OpenAI } from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { AppError } from "../errors/app.error";
+import {
+  GenerateRecipeBody,
+  OpenAIRecipe,
+  openAIRecipeSchema,
+} from "../schemas/openai.schema";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-type RecipeOptions = {
-  ingredients: string[];
-  servings?: number;
-  diet?: string;
-  cuisine?: string;
-  mealType?: string;
-  bravery?: number;
-  macroPreference?: string;
-};
-
-export const getRecipeFromIngredients = async (options: RecipeOptions) => {
+export const getRecipeFromIngredients = async (
+  options: GenerateRecipeBody
+): Promise<OpenAIRecipe> => {
   const {
     ingredients,
     servings = 2,
@@ -79,20 +78,26 @@ INGREDIENTS: ${ingredients.join(", ")}
 
   const temperature = bravery ? Math.min(Math.max(bravery, 0), 1.5) : 0.7;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4-turbo",
+  const response = await openai.chat.completions.parse({
+    model: process.env.OPENAI_MODEL || "gpt-4o-2024-08-06",
     messages: [{ role: "user", content: prompt }],
-    temperature: temperature,
+    response_format: zodResponseFormat(openAIRecipeSchema, "recipe"),
+    temperature,
     max_tokens: 1000,
   });
 
-  const content = response.choices[0]?.message?.content;
+  const message = response.choices[0]?.message;
+  const parsedRecipe = message?.parsed;
 
-  if (!content) throw new Error("No content returned from OpenAI");
+  if (!parsedRecipe) {
+    if (message?.refusal) {
+      throw new AppError("OpenAI refused to generate a recipe", 502, {
+        refusal: message.refusal,
+      });
+    }
 
-  try {
-    return JSON.parse(content);
-  } catch {
-    throw new Error("Failed to parse recipe JSON from OpenAI");
+    throw new AppError("OpenAI returned an invalid recipe response", 502);
   }
+
+  return openAIRecipeSchema.parse(parsedRecipe);
 };

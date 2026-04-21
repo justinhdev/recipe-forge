@@ -1,13 +1,19 @@
 import { useCallback } from "react";
 import api from "../utils/api";
-import type { Recipe, GenerateOptions } from "../types/recipe";
+import type {
+  GenerateOptions,
+  GenerateRecipeRequest,
+  GenerateRecipeResponse,
+  Recipe,
+  SaveRecipeRequest,
+} from "../types/contracts";
 
 export function useRecipeActions() {
   const generate = useCallback(
     async (ingredients: string[], opts: GenerateOptions) => {
       const { servings, diet, cuisine, mealType, bravery, macroPreference } =
         opts;
-      const res = await api.post("/api/ai/generate", {
+      const payload: GenerateRecipeRequest = {
         ingredients,
         servings,
         diet,
@@ -15,13 +21,17 @@ export function useRecipeActions() {
         mealType,
         bravery,
         macroPreference,
-      });
-      return res.data as Recipe;
+      };
+      const res = await api.post<GenerateRecipeResponse>(
+        "/api/ai/generate",
+        payload
+      );
+      return res.data;
     },
     []
   );
 
-  const save = useCallback(async (recipe: Recipe) => {
+  const save = useCallback(async (recipe: SaveRecipeRequest) => {
     await api.post("/api/recipes", recipe);
   }, []);
 
