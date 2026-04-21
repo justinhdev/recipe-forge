@@ -192,7 +192,14 @@ DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-2024-08-06
+CLIENT_URL=http://localhost:5173
 PORT=3000
+```
+
+Create a `.env` file inside the `client/` directory:
+
+```env
+VITE_API_URL=http://localhost:3000
 ```
 
 ---
@@ -255,3 +262,55 @@ In a second terminal:
 cd client
 npm run dev
 ```
+
+---
+
+## Deployment
+
+This project is set up to deploy with:
+
+- `client` on Vercel Hobby
+- `server` on Render Starter
+- `database` on Neon Free
+
+### Vercel Hobby (`client/`)
+
+- Import the repository into Vercel
+- Set the root directory to `client`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Environment variable:
+
+```env
+VITE_API_URL=https://your-render-service.onrender.com
+```
+
+### Render Starter (`server/`)
+
+- Create a new Web Service from this repository
+- Set the root directory to `server`
+- Build command: `npm ci && npm run build`
+- Start command: `npx prisma migrate deploy && npm run start`
+
+Set these environment variables in Render:
+
+```env
+DATABASE_URL=your_neon_connection_string
+JWT_SECRET=your_jwt_secret
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-2024-08-06
+CLIENT_URL=https://your-vercel-app.vercel.app
+PORT=10000
+```
+
+### Neon Free
+
+- Create a Postgres project in Neon
+- Copy the pooled connection string into Render as `DATABASE_URL`
+- Run Prisma migrations during deploy with the Render start command above
+
+### Notes
+
+- `CLIENT_URL` controls which frontend origins can call the API through CORS
+- `VITE_API_URL` controls which backend URL the React app talks to
+- If you add a custom domain later, update both values to match it

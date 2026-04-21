@@ -6,6 +6,8 @@ import type {
   RegisterUserRequest,
 } from "../types/contracts";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 type Props = {
   isLogin?: boolean;
 };
@@ -20,8 +22,8 @@ export default function AuthForm({ isLogin = false }: Props) {
   const handleSubmit = async () => {
     setError("");
     const url = isLogin
-      ? "http://localhost:3000/api/auth/login"
-      : "http://localhost:3000/api/auth/register";
+      ? `${API_BASE_URL}/api/auth/login`
+      : `${API_BASE_URL}/api/auth/register`;
 
     const payload: LoginUserRequest | RegisterUserRequest = isLogin
       ? { email, password }
