@@ -12,6 +12,11 @@ type Props = {
   isLogin?: boolean;
 };
 
+type AuthResponse = {
+  token: string;
+  name?: string;
+};
+
 export default function AuthForm({ isLogin = false }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,10 +38,11 @@ export default function AuthForm({ isLogin = false }: Props) {
       : { name, email, password };
 
     try {
-      const res = await api.post(url, payload);
+      const res = await api.post<AuthResponse>(url, payload);
       localStorage.setItem("token", res.data.token);
-      if (!isLogin) {
-        localStorage.setItem("name", name);
+      const displayName = res.data.name ?? (!isLogin ? name : "");
+      if (displayName) {
+        localStorage.setItem("name", displayName);
       }
       navigate("/generate");
     } catch (err: unknown) {

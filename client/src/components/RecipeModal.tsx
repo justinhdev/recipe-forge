@@ -1,7 +1,8 @@
+import { useState } from "react";
 import MacroChart from "./MacroChart";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getIcon } from "../utils/getIcon";
-import { X } from "lucide-react";
+import { X, Trash2, Copy, Check } from "lucide-react";
 import InstructionsList from "./InstructionsList";
 import type { Recipe } from "../types/recipe";
 
@@ -11,7 +12,23 @@ type Props = {
   onDelete: (id: number) => void;
 };
 
+function buildShareText(recipe: Required<Recipe>): string {
+  return [
+    `🍴 ${recipe.title}`,
+    "",
+    `Ingredients: ${recipe.ingredients.join(", ")}`,
+    "",
+    `Instructions:\n${recipe.instructions}`,
+    "",
+    `Macros: ${recipe.calories} kcal · ${recipe.protein}g protein · ${recipe.fat}g fat · ${recipe.carbs}g carbs`,
+  ].join("\n");
+}
+
 export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showMacros, setShowMacros] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   if (!recipe) return null;
 
   const {
@@ -25,63 +42,220 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
     carbs,
   } = recipe;
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(buildShareText(recipe));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback: ignore
+    }
+  };
+
+  const handleDelete = () => {
+    onDelete(id);
+    onClose();
+  };
+
   return (
     <motion.div
-      className="fixed inset-0 z-50 bg-[rgba(0,0,0,0.5)] flex items-center justify-center px-4"
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4"
       onClick={onClose}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white dark:bg-gray-900 max-w-2xl w-full rounded-lg shadow-lg overflow-y-auto max-h-[90vh] p-6 space-y-4 relative text-gray-900 dark:text-white"
+        className="bg-white dark:bg-gray-900 max-w-2xl w-full rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-gray-900 dark:text-white"
         onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2 }}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-3 text-xl text-gray-400 hover:text-gray-200"
-        >
-          <X size={20} />
-        </button>
+        {/* Accent bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-green-500 shrink-0" />
 
-        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-          <span>{getIcon(title)}</span>
-          {title}
-        </h2>
+        {/* Scrollable body */}
+        <div className="overflow-y-auto p-6 space-y-4 flex-1">
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition"
+          >
+            <X size={14} />
+          </button>
 
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          <strong>Ingredients:</strong> {ingredients.join(", ")}
-        </p>
+          {/* Title */}
+          <h2 className="text-xl font-bold flex items-center gap-2 pr-8">
+            <span>{getIcon(title)}</span>
+            {title}
+          </h2>
 
-        <div>
-          <p className="text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">
-            Instructions:
-          </p>
-          <InstructionsList instructions={instructions} />
+          {/* Ingredient pills */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+              Ingredients
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {ingredients.map((item, idx) => (
+                <span
+                  key={`${item}-${idx}`}
+                  className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-700 dark:text-gray-300"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+              Instructions
+            </p>
+            <InstructionsList instructions={instructions} />
+          </div>
+
+          {/* Macro row */}
+          <div className="flex flex-wrap gap-2 rounded-xl bg-gray-50 dark:bg-gray-800 p-3">
+            {[
+              {
+                label: `${protein}g protein`,
+                bg: "bg-blue-50 dark:bg-blue-950",
+                text: "text-blue-700 dark:text-blue-300",
+              },
+              {
+                label: `${fat}g fat`,
+                bg: "bg-yellow-50 dark:bg-yellow-950",
+                text: "text-yellow-700 dark:text-yellow-300",
+              },
+              {
+                label: `${carbs}g carbs`,
+                bg: "bg-green-50 dark:bg-green-950",
+                text: "text-green-700 dark:text-green-300",
+              },
+              {
+                label: `${calories} kcal`,
+                bg: "bg-purple-50 dark:bg-purple-950",
+                text: "text-purple-700 dark:text-purple-300",
+              },
+            ].map(({ label, bg, text }) => (
+              <span
+                key={label}
+                className={`${bg} ${text} rounded-full px-3 py-1 text-xs font-semibold`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* Macro chart toggle */}
+          <div className="text-center">
+            <button
+              onClick={() => setShowMacros((p) => !p)}
+              className="text-xs text-blue-500 dark:text-blue-400 hover:underline"
+            >
+              {showMacros ? "Hide chart" : "Show macro chart"}
+            </button>
+          </div>
+          {showMacros && (
+            <MacroChart protein={protein} fat={fat} carbs={carbs} />
+          )}
         </div>
 
-        <MacroChart protein={protein} fat={fat} carbs={carbs} />
+        {/* Footer actions */}
+        <div className="shrink-0 border-t border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              {copied ? (
+                <Check size={12} className="text-green-500" />
+              ) : (
+                <Copy size={12} />
+              )}
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  if (navigator.share) {
+                    await navigator.share({
+                      title,
+                      text: buildShareText(recipe),
+                    });
+                  } else {
+                    handleCopy();
+                  }
+                } catch {
+                  // User canceled or sharing failed.
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              🔗 Share
+            </button>
+          </div>
 
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-          {calories} kcal • {protein}g protein • {fat}g fat • {carbs}g carbs
-        </p>
-
-        <div className="flex justify-end">
+          {/* Delete — ghost style, opens confirm */}
           <button
-            onClick={() => {
-              onDelete(id);
-              onClose();
-            }}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 dark:hover:bg-red-400 text-sm transition duration-300"
+            onClick={() => setConfirmDelete(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-xs font-medium text-red-500 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-950"
           >
-            Delete Recipe
+            <Trash2 size={12} />
+            Delete
           </button>
         </div>
       </motion.div>
+
+      {/* Delete confirmation dialog */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setConfirmDelete(false);
+            }}
+          >
+            <motion.div
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 w-full max-w-xs text-center"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-3xl mb-3">⚠️</div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+                Delete this recipe?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                This action can't be undone.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 transition hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+                >
+                  Yes, delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

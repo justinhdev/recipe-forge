@@ -23,7 +23,7 @@ export const registerUser = async (
     });
 
     const token = generateToken(user.id);
-    res.json({ token });
+    res.json({ token, name: user.name });
   } catch (err) {
     next(err);
   }
@@ -45,7 +45,7 @@ export const loginUser = async (
       return res.status(401).json({ message: "Invalid credentials" });
 
     const token = generateToken(user.id);
-    res.json({ token });
+    res.json({ token, name: user.name });
   } catch (err) {
     next(err);
   }
