@@ -1,4 +1,4 @@
-export const INGREDIENTS = [
+const RAW_INGREDIENTS = [
 
   // Fruits
   "apple", "apricot", "avocado", "banana", "blackberry", "blueberry", "boysenberry",
@@ -159,3 +159,24 @@ export const INGREDIENTS = [
   "rock salt", "smoked salt", "anchovies", "vegetarian bacon", "plant-based burger",
   "seitan", "hearts of palm", "artichoke hearts",
 ];
+
+export const normalizeIngredientName = (ingredient: string) =>
+  ingredient.trim().replace(/\s+/g, " ").toLowerCase();
+
+const titleCaseWord = (word: string) =>
+  word
+    .split("-")
+    .map((part) =>
+      part ? part.charAt(0).toUpperCase() + part.slice(1) : part
+    )
+    .join("-");
+
+export const formatIngredientName = (ingredient: string) =>
+  normalizeIngredientName(ingredient)
+    .split(" ")
+    .map(titleCaseWord)
+    .join(" ");
+
+export const INGREDIENTS = Array.from(
+  new Set(RAW_INGREDIENTS.map(normalizeIngredientName))
+).sort((a, b) => a.localeCompare(b));
