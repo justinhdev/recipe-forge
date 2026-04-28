@@ -1,23 +1,17 @@
 import { useEffect, useState } from "react";
+import { applyTheme, getInitialTheme, saveTheme } from "../utils/theme";
 
 export default function DarkToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => getInitialTheme() === "dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const enabled = savedTheme === "dark" || (!savedTheme && prefersDark);
-    setIsDark(enabled);
-    document.documentElement.classList.toggle("dark", enabled);
-  }, []);
+    applyTheme(isDark ? "dark" : "light");
+  }, [isDark]);
 
   const toggleDark = () => {
     const newValue = !isDark;
     setIsDark(newValue);
-    document.documentElement.classList.toggle("dark", newValue);
-    localStorage.setItem("theme", newValue ? "dark" : "light");
+    saveTheme(newValue ? "dark" : "light");
   };
 
   return (

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import MacroChart from "./MacroChart";
 import InstructionsList from "./InstructionsList";
@@ -94,7 +94,7 @@ export default function RecipeDetails({
         {onSave && (
           <button
             onClick={async () => {
-              if (saving) return;
+              if (saving || disableSave) return;
               setSaving(true);
               try {
                 await onSave();
@@ -103,15 +103,16 @@ export default function RecipeDetails({
               }
             }}
             disabled={disableSave || saving}
-            className={`rounded bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 ${
-              disableSave ? "cursor-not-allowed opacity-70" : "cursor-pointer"
+            className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+              disableSave
+                ? "cursor-default border border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400"
+                : saving
+                  ? "cursor-wait bg-blue-400 text-white dark:bg-blue-600"
+                  : "cursor-pointer bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             }`}
           >
-            {disableSave
-              ? "Recipe Saved"
-              : saving
-                ? "Saving..."
-                : "Save Recipe"}
+            {disableSave && <CheckCircle2 size={14} />}
+            {disableSave ? "Saved" : saving ? "Saving…" : "Save Recipe"}
           </button>
         )}
       </div>

@@ -11,52 +11,86 @@ export default function HelpModal({ isOpen, onClose }: Props) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 bg-[rgba(0,0,0,0.5)] flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-lg w-full text-sm text-gray-800 dark:text-gray-200 shadow-lg relative overflow-y-auto max-h-[90vh]"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-lg w-full text-sm text-gray-800 dark:text-gray-200 shadow-2xl relative overflow-y-auto max-h-[90vh] border border-gray-100 dark:border-gray-800"
             onClick={(e) => e.stopPropagation()}
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ scale: 0.95, opacity: 0, y: 8 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-2 right-3 text-2xl text-gray-400 hover:text-gray-200"
               aria-label="Close Help"
+              className="absolute top-4 right-4 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition"
             >
-              <X size={20} />
+              <X size={14} />
             </button>
 
-            <h2 className="text-xl font-bold mb-4">
-              ℹ️ How Recipe Generation Works
+            <h2 className="text-lg font-bold mb-5 text-gray-900 dark:text-white pr-8">
+              How Recipe Generation Works
             </h2>
-            <ul className="space-y-3 list-disc list-inside leading-relaxed">
-              <li>
-                Enter ingredients like <em>"chicken"</em>, <em>"broccoli"</em>,
-                or <em>"olive oil"</em>.
-              </li>
-              <li>
-                Recognized ingredients are shown in{" "}
-                <span className="text-blue-600 font-semibold">blue</span>.
-              </li>
-              <li>
-                Custom ingredients are shown in{" "}
-                <span className="text-yellow-500 font-semibold">yellow</span>{" "}
-                and still work.
-              </li>
-              <li>
-                Click <strong>Generate Recipe</strong> to get a recipe and
-                macros.
-              </li>
-              <li>
-                Save recipes to view them later in <strong>My Recipes</strong>.
-              </li>
+
+            <ul className="space-y-3 leading-relaxed">
+              {[
+                <>
+                  Enter ingredients like{" "}
+                  <em className="text-gray-600 dark:text-gray-300">
+                    "chicken"
+                  </em>
+                  ,{" "}
+                  <em className="text-gray-600 dark:text-gray-300">
+                    "broccoli"
+                  </em>
+                  , or{" "}
+                  <em className="text-gray-600 dark:text-gray-300">
+                    "olive oil"
+                  </em>
+                  .
+                </>,
+                <>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">
+                    Blue tags
+                  </span>{" "}
+                  are recognized ingredients from our list.
+                </>,
+                <>
+                  <span className="font-semibold text-yellow-500">
+                    Yellow tags
+                  </span>{" "}
+                  are custom ingredients — they still work great.
+                </>,
+                <>
+                  Hit{" "}
+                  <strong className="text-gray-900 dark:text-white">
+                    Generate Recipe
+                  </strong>{" "}
+                  to get a full recipe with macros.
+                </>,
+                <>
+                  Save recipes to revisit them anytime in{" "}
+                  <strong className="text-gray-900 dark:text-white">
+                    My Recipes
+                  </strong>
+                  .
+                </>,
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950 text-xs font-bold text-blue-600 dark:text-blue-400">
+                    {i + 1}
+                  </span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {item}
+                  </span>
+                </li>
+              ))}
             </ul>
           </motion.div>
         </motion.div>

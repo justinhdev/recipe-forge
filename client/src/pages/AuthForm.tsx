@@ -1,12 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import type { FormEvent } from "react";
-import type {
-  LoginUserRequest,
-  RegisterUserRequest,
-} from "../types/contracts";
+import type { LoginUserRequest, RegisterUserRequest } from "../types/contracts";
 import api from "../utils/api";
+import { Anvil } from "lucide-react";
 
 type Props = {
   isLogin?: boolean;
@@ -41,9 +39,7 @@ export default function AuthForm({ isLogin = false }: Props) {
       const res = await api.post<AuthResponse>(url, payload);
       localStorage.setItem("token", res.data.token);
       const displayName = res.data.name ?? (!isLogin ? name : "");
-      if (displayName) {
-        localStorage.setItem("name", displayName);
-      }
+      if (displayName) localStorage.setItem("name", displayName);
       navigate("/generate");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
@@ -56,55 +52,95 @@ export default function AuthForm({ isLogin = false }: Props) {
     }
   };
 
+  const inputClass =
+    "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400";
+
   return (
-    <form
-      className="max-w-md mx-auto px-4 py-6 sm:mt-12 bg-white dark:bg-gray-900 shadow dark:shadow-lg rounded duration-300"
-      onSubmit={handleSubmit}
-    >
-      <h2 className="text-2xl font-bold mb-4 text-center text-gray-900 dark:text-white duration-300">
-        {isLogin ? "Login" : "Register"}
-      </h2>
-      {!isLogin && (
-        <input
-          type="text"
-          placeholder="Name"
-          className="w-full px-4 py-3 text-base border rounded mb-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 duration-300"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          maxLength={100}
-        />
-      )}
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full px-4 py-3 text-base border rounded mb-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 duration-300"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full px-4 py-3 text-base border rounded mb-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 duration-300"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        minLength={isLogin ? 1 : 8}
-        maxLength={128}
-      />
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:cursor-wait disabled:opacity-70 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-300"
-        disabled={submitting}
-      >
-        {submitting ? "Please wait..." : isLogin ? "Login" : "Register"}
-      </button>
-      {error && (
-        <p className="text-red-500 mt-3 text-sm dark:text-red-400 duration-300">
-          {error}
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 px-4 transition-colors duration-300">
+      <div className="w-full max-w-md">
+        {/* Brand header */}
+        <div className="mb-8 flex flex-col items-center gap-2 text-center">
+          <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none mb-1">
+            <Anvil size={24} />
+          </div>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+            Recipe Forge
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {isLogin
+              ? "Welcome back — sign in to your account"
+              : "Create an account to start generating recipes"}
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-xl dark:shadow-none border border-gray-100 dark:border-gray-800 p-8">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
+            {isLogin ? "Sign in" : "Create account"}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            {!isLogin && (
+              <input
+                type="text"
+                placeholder="Name"
+                className={inputClass}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                maxLength={100}
+              />
+            )}
+            <input
+              type="email"
+              placeholder="Email"
+              className={inputClass}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className={inputClass}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={isLogin ? 1 : 8}
+              maxLength={128}
+            />
+
+            {error && (
+              <p className="rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-1 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-70 dark:bg-blue-500 dark:shadow-none dark:hover:bg-blue-600"
+            >
+              {submitting
+                ? "Please wait…"
+                : isLogin
+                  ? "Sign in"
+                  : "Create account"}
+            </button>
+          </form>
+        </div>
+
+        {/* Toggle link */}
+        <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          <Link
+            to={isLogin ? "/register" : "/login"}
+            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {isLogin ? "Sign up" : "Sign in"}
+          </Link>
         </p>
-      )}
-    </form>
+      </div>
+    </div>
   );
 }
