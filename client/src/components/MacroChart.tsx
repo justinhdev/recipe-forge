@@ -27,8 +27,8 @@ function MacroChartInner({ protein, fat, carbs }: MacroChartProps) {
   );
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="w-full h-[300px] sm:h-[350px] md:h-[400px]">
+    <div className="mx-auto w-full max-w-md">
+      <div className="h-[250px] w-full sm:h-[350px] md:h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
             <Pie
@@ -37,9 +37,9 @@ function MacroChartInner({ protein, fat, carbs }: MacroChartProps) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={100}
+              outerRadius="62%"
               innerRadius={20}
-              label={({ name, value }) => `${name} ${value}g`}
+              label={({ value }) => `${value}g`}
               labelLine={false}
               animationDuration={1000}
             >

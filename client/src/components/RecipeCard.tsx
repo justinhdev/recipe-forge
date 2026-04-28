@@ -82,9 +82,11 @@ export default function RecipeCard({
       <div className="p-4 sm:p-5 flex flex-col gap-3 flex-1">
         {/* Title row */}
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xl leading-none">{getIcon(title)}</span>
-            <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white leading-snug">
+          <div className="flex min-w-0 items-start gap-2">
+            <span className="shrink-0 text-xl leading-none">
+              {getIcon(title)}
+            </span>
+            <h3 className="min-w-0 text-sm font-bold leading-snug text-gray-900 break-words dark:text-white sm:text-base">
               {title}
             </h3>
           </div>

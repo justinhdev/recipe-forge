@@ -59,14 +59,14 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 py-3 sm:items-center sm:px-4"
       onClick={onClose}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white dark:bg-gray-900 max-w-2xl w-full rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-gray-900 dark:text-white"
+        className="flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white text-gray-900 shadow-2xl dark:bg-gray-900 dark:text-white sm:max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -77,7 +77,7 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
         <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-green-500 shrink-0" />
 
         {/* Scrollable body */}
-        <div className="overflow-y-auto p-6 space-y-4 flex-1">
+        <div className="flex-1 space-y-4 overflow-y-auto p-5 sm:p-6">
           {/* Close */}
           <button
             onClick={onClose}
@@ -87,9 +87,9 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
           </button>
 
           {/* Title */}
-          <h2 className="text-xl font-bold flex items-center gap-2 pr-8">
-            <span>{getIcon(title)}</span>
-            {title}
+          <h2 className="flex items-start gap-2 pr-8 text-lg font-bold leading-snug sm:text-xl">
+            <span className="shrink-0">{getIcon(title)}</span>
+            <span className="min-w-0 break-words">{title}</span>
           </h2>
 
           {/* Ingredient pills */}
@@ -165,11 +165,11 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
         </div>
 
         {/* Footer actions */}
-        <div className="shrink-0 border-t border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex shrink-0 flex-col gap-3 border-t border-gray-100 px-5 py-4 dark:border-gray-800 min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between sm:px-6">
+          <div className="grid grid-cols-2 gap-2 min-[380px]:flex min-[380px]:items-center">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               {copied ? (
                 <Check size={12} className="text-green-500" />
@@ -193,7 +193,7 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
                   // User canceled or sharing failed.
                 }
               }}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               🔗 Share
             </button>
@@ -202,7 +202,7 @@ export default function RecipeModal({ recipe, onClose, onDelete }: Props) {
           {/* Delete — ghost style, opens confirm */}
           <button
             onClick={() => setConfirmDelete(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-xs font-medium text-red-500 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-950"
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
           >
             <Trash2 size={12} />
             Delete

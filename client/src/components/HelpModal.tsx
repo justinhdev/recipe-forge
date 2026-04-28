@@ -11,14 +11,14 @@ export default function HelpModal({ isOpen, onClose }: Props) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-3 py-3 sm:items-center sm:px-4"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-lg w-full text-sm text-gray-800 dark:text-gray-200 shadow-2xl relative overflow-y-auto max-h-[90vh] border border-gray-100 dark:border-gray-800"
+            className="relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-100 bg-white p-5 text-sm text-gray-800 shadow-2xl dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 sm:max-h-[90vh] sm:p-6"
             onClick={(e) => e.stopPropagation()}
             initial={{ scale: 0.95, opacity: 0, y: 8 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}

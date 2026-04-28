@@ -29,11 +29,11 @@ export default function RecipeDetails({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
       transition={{ duration: 0.4 }}
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 text-sm sm:text-base"
+      className="rounded-xl bg-white p-5 text-sm dark:bg-gray-800 sm:p-6 sm:text-base"
     >
-      <h3 className="flex items-center justify-center gap-2 text-xl font-semibold mb-2">
-        <span>{getIcon(recipe.title)}</span>
-        <span>{recipe.title}</span>
+      <h3 className="mb-2 flex items-start justify-center gap-2 text-center text-lg font-semibold leading-snug sm:text-xl">
+        <span className="shrink-0">{getIcon(recipe.title)}</span>
+        <span className="min-w-0 break-words">{recipe.title}</span>
       </h3>
 
       <h4 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-2">
@@ -56,7 +56,7 @@ export default function RecipeDetails({
       <InstructionsList instructions={recipe.instructions} />
 
       <div className="mt-4">
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-1">
+        <p className="mb-1 text-center text-xs leading-relaxed text-gray-500 dark:text-gray-400">
           {recipe.calories} kcal • {recipe.protein}g protein • {recipe.fat}g fat
           • {recipe.carbs}g carbs
         </p>
@@ -82,11 +82,11 @@ export default function RecipeDetails({
         )}
       </div>
 
-      <div className="mt-4 flex gap-3 justify-end">
+      <div className="mt-4 flex flex-col-reverse gap-3 min-[380px]:flex-row min-[380px]:justify-end">
         {onDelete && (
           <button
             onClick={() => onDelete()}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 dark:hover:bg-red-400 text-sm transition duration-300"
+            className="rounded bg-red-500 px-4 py-2 text-sm text-white transition duration-300 hover:bg-red-600 dark:hover:bg-red-400"
           >
             Delete
           </button>
@@ -103,7 +103,7 @@ export default function RecipeDetails({
               }
             }}
             disabled={disableSave || saving}
-            className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ${
               disableSave
                 ? "cursor-default border border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400"
                 : saving

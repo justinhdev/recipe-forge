@@ -11,7 +11,7 @@ import type { Recipe } from "../types/recipe";
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-16 px-8 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white px-5 py-12 text-center dark:border-gray-700 dark:bg-gray-800 sm:px-8 sm:py-16">
       <span className="text-5xl mb-4">🍽️</span>
       <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
         No recipes yet
@@ -31,7 +31,7 @@ function EmptyState() {
 
 function LoadingGrid() {
   return (
-    <div className="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))]">
+    <div className="grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_300px),_1fr))] gap-6">
       {Array.from({ length: 4 }).map((_, i) => (
         <RecipeShimmer key={i} />
       ))}
@@ -83,8 +83,8 @@ export default function MyRecipes() {
   return (
     <PageWrapper>
       {/* Header row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-2 min-[380px]:flex-row min-[380px]:items-center min-[380px]:gap-3">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             My Saved Recipes
           </h2>
@@ -124,7 +124,7 @@ export default function MyRecipes() {
           No recipes match "<strong>{search}</strong>".
         </p>
       ) : (
-        <div className="grid gap-6 grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] items-stretch">
+        <div className="grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_300px),_1fr))] items-stretch gap-6">
           {filtered.map((recipe) => (
             <motion.div
               key={recipe.id}

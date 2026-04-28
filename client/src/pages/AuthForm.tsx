@@ -56,7 +56,7 @@ export default function AuthForm({ isLogin = false }: Props) {
     "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 px-4 transition-colors duration-300">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 px-4 py-8 transition-colors duration-300 dark:from-gray-900 dark:to-gray-800">
       <div className="w-full max-w-md">
         {/* Brand header */}
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
@@ -74,9 +74,9 @@ export default function AuthForm({ isLogin = false }: Props) {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-xl dark:shadow-none border border-gray-100 dark:border-gray-800 p-8">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-xl dark:border-gray-800 dark:bg-gray-900 dark:shadow-none sm:p-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
-            {isLogin ? "Sign in" : "Create account"}
+            {isLogin ? "Login" : "Register"}
           </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -124,8 +124,8 @@ export default function AuthForm({ isLogin = false }: Props) {
               {submitting
                 ? "Please wait…"
                 : isLogin
-                  ? "Sign in"
-                  : "Create account"}
+                  ? "Login"
+                  : "Register"}
             </button>
           </form>
         </div>

@@ -21,7 +21,7 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -16 }}
           transition={{ duration: 0.25 }}
-          className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl bg-gray-900 dark:bg-gray-700 px-4 py-3 text-sm font-medium text-white shadow-lg"
+          className="fixed left-4 right-4 top-4 z-50 mx-auto flex max-w-sm items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-medium text-white shadow-lg dark:bg-gray-700 sm:left-auto sm:mx-0 sm:justify-start"
         >
           <CheckCircle2 size={16} className="text-green-400 shrink-0" />
           {message}
@@ -116,7 +116,7 @@ export default function GenerateRecipe() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-2xl mx-auto space-y-6"
+          className="mx-auto w-full max-w-2xl space-y-5 rounded-xl bg-white p-5 shadow-lg dark:bg-gray-800 sm:space-y-6 sm:p-8"
         >
           <h2 className="text-2xl font-bold">Generate a Recipe</h2>
 
@@ -143,10 +143,10 @@ export default function GenerateRecipe() {
               </p>
             )}
 
-            <div className="mt-4 flex items-center gap-3 pt-1">
+            <div className="mt-4 flex flex-col gap-3 pt-1 min-[380px]:flex-row min-[380px]:items-center">
               {/* Primary action */}
               <button
-                className={`rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 ${
+                className={`w-full rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 min-[380px]:w-auto ${
                   canGenerate
                     ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-sm shadow-blue-200 dark:shadow-none"
                     : "cursor-not-allowed bg-gray-300 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
@@ -158,13 +158,13 @@ export default function GenerateRecipe() {
               </button>
 
               {/* Secondary action — visually smaller */}
-              <span className="text-xs text-gray-300 dark:text-gray-600">
+              <span className="hidden text-xs text-gray-300 dark:text-gray-600 min-[380px]:inline">
                 or
               </span>
               <button
                 type="button"
                 onClick={handleSurpriseMe}
-                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-500 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 min-[380px]:w-auto"
               >
                 <Wand2 size={13} />
                 Surprise Me
