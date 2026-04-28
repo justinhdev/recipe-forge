@@ -15,4 +15,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const hadToken = Boolean(localStorage.getItem("token"));
+    if (error.response?.status === 401 && hadToken) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+
+      if (!["/login", "/register"].includes(window.location.pathname)) {
+        window.location.assign("/login");
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default api;

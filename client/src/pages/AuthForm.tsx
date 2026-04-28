@@ -5,8 +5,7 @@ import type {
   LoginUserRequest,
   RegisterUserRequest,
 } from "../types/contracts";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import api from "../utils/api";
 
 type Props = {
   isLogin?: boolean;
@@ -21,16 +20,14 @@ export default function AuthForm({ isLogin = false }: Props) {
 
   const handleSubmit = async () => {
     setError("");
-    const url = isLogin
-      ? `${API_BASE_URL}/api/auth/login`
-      : `${API_BASE_URL}/api/auth/register`;
+    const url = isLogin ? "/api/auth/login" : "/api/auth/register";
 
     const payload: LoginUserRequest | RegisterUserRequest = isLogin
       ? { email, password }
       : { name, email, password };
 
     try {
-      const res = await axios.post(url, payload);
+      const res = await api.post(url, payload);
       localStorage.setItem("token", res.data.token);
       if (!isLogin) {
         localStorage.setItem("name", name);
