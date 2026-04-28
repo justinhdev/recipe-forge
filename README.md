@@ -7,7 +7,13 @@
 </p>
 
 <p align="center">
-  Generate structured recipes from selected ingredients, customize recipe preferences, and save recipes to your account.
+  Generate structured recipes from available ingredients, tailor outputs with nutrition and cuisine preferences, and save results to a personal dashboard.
+</p>
+
+<p align="center">
+  <a href="https://recipe.justinhdev.com"><strong>Live Demo</strong></a>
+  ·
+  <a href="https://github.com/justinhdev/recipe-forge"><strong>Source Code</strong></a>
 </p>
 
 <p align="center">
@@ -24,9 +30,9 @@
 
 ## Overview
 
-Recipe Forge is a full-stack web application that generates recipes from user-selected ingredients using the OpenAI API. Users can customize recipe output with options like servings, diet, cuisine, meal type, macro preference, and creativity level, then save generated recipes to their account.
+Recipe Forge is a full-stack web application that turns user-selected ingredients into structured recipes with macro breakdowns using the OpenAI API. Users can tailor recipe generation with options like servings, diet, cuisine, meal type, macro preference, and creativity level, then save recipes to their account for later access.
 
-This project was built to strengthen hands-on experience with modern full-stack development, especially:
+This project was built to deepen hands-on experience with modern full-stack development, especially:
 - TypeScript across frontend and backend
 - API design with Express
 - PostgreSQL data modeling with Prisma
@@ -38,24 +44,14 @@ This project was built to strengthen hands-on experience with modern full-stack 
 
 ## Features
 
-- Generate recipes from selected ingredients
-- Customize recipe output with:
-  - servings
-  - diet
-  - cuisine
-  - meal type
-  - macro preference
-  - creativity level
-- JWT-based authentication
-- Save generated recipes to a user account
-- Retrieve and delete saved recipes through authenticated API endpoints
-- Zod validation for every request body and recipe ID route param
-- Clean `400` validation responses with field-level error details
-- OpenAI structured output parsing backed by a Zod schema before responses are returned
-- Shared frontend contract types that mirror the server request/response shapes
-- Server test coverage with Vitest and Supertest
-- Responsive frontend with loading and error states
-- Full-stack architecture with separate client and server applications
+- Ingredient-driven recipe generation with structured macro output
+- Configurable servings, diet, cuisine, meal type, macro priority, and creativity level
+- JWT-based authentication with protected routes for saved recipes
+- Persistent recipe storage with authenticated create, list, and delete flows
+- Zod validation across request bodies, route params, and OpenAI response parsing
+- Shared frontend contract types aligned with backend request and response shapes
+- API test coverage with Vitest and Supertest
+- Responsive React UI with loading, error, and empty states
 
 ---
 
@@ -105,6 +101,11 @@ recipe-forge/
 - OpenAI-powered recipe generation with structured output validation
 - automated integration and unit tests for API behavior and helper logic
 - recipe persistence with Prisma and PostgreSQL
+
+### Deployment
+- frontend hosted on Vercel
+- Express API hosted on Render
+- PostgreSQL hosted on Neon
 
 ---
 
@@ -171,21 +172,17 @@ recipe-forge/
 
 ---
 
-## Getting Started
+## Local Development
 
 ### Prerequisites
-
-Make sure you have installed:
 - Node.js
 - npm
 - PostgreSQL
-- an OpenAI API key
+- OpenAI API key
 
----
+### Environment variables
 
-## Environment Variables
-
-Create a `.env` file inside the `server/` directory:
+`server/.env`
 
 ```env
 DATABASE_URL=your_postgresql_connection_string
@@ -196,65 +193,22 @@ CLIENT_URL=http://localhost:5173
 PORT=3000
 ```
 
-Create a `.env` file inside the `client/` directory:
+`client/.env`
 
 ```env
 VITE_API_URL=http://localhost:3000
 ```
 
----
-
-## Installation
-
-### 1. Clone the repository
+### Run locally
 
 ```bash
 git clone https://github.com/justinhdev/recipe-forge.git
 cd recipe-forge
-```
-
-### 2. Install dependencies
-
-Install frontend dependencies:
-
-```bash
-cd client
-npm install
-```
-
-Install backend dependencies:
-
-```bash
-cd ../server
-npm install
-```
-
-### 3. Set up the database
-
-From the `server/` directory:
-
-```bash
+cd client && npm install
+cd ../server && npm install
 npx prisma migrate dev
-npx prisma generate
-```
-
-### 4. Start the backend server
-
-```bash
 npm run dev
 ```
-
-### 5. Run the server tests
-
-From the `server/` directory:
-
-```bash
-npm test
-```
-
-The test suite automatically points Prisma at a separate Postgres schema named `test`, runs `prisma db push`, and clears data between tests. You do not need to create that schema manually each time, but PostgreSQL does need to be running locally.
-
-### 6. Start the frontend app
 
 In a second terminal:
 
@@ -263,54 +217,12 @@ cd client
 npm run dev
 ```
 
----
+### Tests
 
-## Deployment
+From `server/`:
 
-This project is set up to deploy with:
-
-- `client` on Vercel Hobby
-- `server` on Render Starter
-- `database` on Neon Free
-
-### Vercel Hobby (`client/`)
-
-- Import the repository into Vercel
-- Set the root directory to `client`
-- Build command: `npm run build`
-- Output directory: `dist`
-- Environment variable:
-
-```env
-VITE_API_URL=https://your-render-service.onrender.com
+```bash
+npm test
 ```
 
-### Render Starter (`server/`)
-
-- Create a new Web Service from this repository
-- Set the root directory to `server`
-- Build command: `npm ci && npm run build`
-- Start command: `npx prisma migrate deploy && npm run start`
-
-Set these environment variables in Render:
-
-```env
-DATABASE_URL=your_neon_connection_string
-JWT_SECRET=your_jwt_secret
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-4o-2024-08-06
-CLIENT_URL=https://your-vercel-app.vercel.app
-PORT=10000
-```
-
-### Neon Free
-
-- Create a Postgres project in Neon
-- Copy the pooled connection string into Render as `DATABASE_URL`
-- Run Prisma migrations during deploy with the Render start command above
-
-### Notes
-
-- `CLIENT_URL` controls which frontend origins can call the API through CORS
-- `VITE_API_URL` controls which backend URL the React app talks to
-- If you add a custom domain later, update both values to match it
+The test suite uses a separate Postgres schema named `test`, runs `prisma db push`, and clears data between test runs.
