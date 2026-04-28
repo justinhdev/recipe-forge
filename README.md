@@ -186,6 +186,7 @@ recipe-forge/
 
 ```env
 DATABASE_URL=your_postgresql_connection_string
+TEST_DATABASE_URL=your_test_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-2024-08-06
@@ -225,4 +226,10 @@ From `server/`:
 npm test
 ```
 
-The test suite uses a separate Postgres schema named `test`, runs `prisma db push`, and clears data between test runs.
+The server test suite requires `TEST_DATABASE_URL`, rewrites it to use a separate Postgres schema named `test`, runs `prisma db push`, and clears data between test runs.
+
+From `client/`:
+
+```bash
+npm test
+```

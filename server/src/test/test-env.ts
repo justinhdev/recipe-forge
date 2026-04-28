@@ -2,10 +2,10 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
-const baseDatabaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+const baseDatabaseUrl = process.env.TEST_DATABASE_URL;
 
 if (!baseDatabaseUrl) {
-  throw new Error("DATABASE_URL or TEST_DATABASE_URL must be set for tests");
+  throw new Error("TEST_DATABASE_URL must be set for tests");
 }
 
 const testDatabaseUrl = new URL(baseDatabaseUrl.replace(/^"|"$/g, ""));

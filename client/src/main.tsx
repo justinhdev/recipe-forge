@@ -1,38 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
 import "./index.css";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import GenerateRecipe from "./pages/GenerateRecipe";
-import ProtectedRoute from "./components/ProtectedRoute";
-import MyRecipes from "./pages/MyRecipes";
-import Landing from "./pages/Landing";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/generate"
-          element={
-            <ProtectedRoute>
-              <GenerateRecipe />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-recipes"
-          element={
-            <ProtectedRoute>
-              <MyRecipes />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <App />
     </BrowserRouter>
   </StrictMode>
 );

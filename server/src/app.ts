@@ -13,6 +13,7 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .filter(Boolean);
 
 const localhostOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const allowLocalhostOrigins = process.env.NODE_ENV !== "production";
 
 app.use(
   cors({
@@ -20,7 +21,7 @@ app.use(
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
-        localhostOriginPattern.test(origin)
+        (allowLocalhostOrigins && localhostOriginPattern.test(origin))
       ) {
         callback(null, true);
         return;
