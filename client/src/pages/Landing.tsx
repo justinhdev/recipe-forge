@@ -48,7 +48,7 @@ export default function Landing() {
 
           <p className="mx-auto mt-4 max-w-lg text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
             Tell us what's in your fridge. Get a personalized recipe with macros
-            tailored to your goals — in seconds.
+            tailored to your goals in seconds.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
