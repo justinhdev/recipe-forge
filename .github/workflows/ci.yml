@@ -63,6 +63,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/recipe_forge_ci?schema=public
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/recipe_forge_ci?schema=public
       JWT_SECRET: ci-secret
       OPENAI_API_KEY: ci-openai-key
       OPENAI_MODEL: gpt-4o-2024-08-06
