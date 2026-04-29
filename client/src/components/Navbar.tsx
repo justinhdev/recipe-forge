@@ -12,6 +12,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   const name = localStorage.getItem("name") ?? "Account";
   const initials = name
@@ -74,62 +75,86 @@ export default function Navbar() {
           <Link to="/generate" className={linkStyle("/generate")}>
             Generate
           </Link>
-          <Link to="/my-recipes" className={linkStyle("/my-recipes")}>
-            My Recipes
-          </Link>
+          {isAuthenticated && (
+            <Link to="/my-recipes" className={linkStyle("/my-recipes")}>
+              My Recipes
+            </Link>
+          )}
 
           <div className="mx-2 h-4 w-px bg-gray-200 dark:bg-gray-700" />
 
           <DarkToggle />
 
-          {/* User avatar dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen((p) => !p)}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
-                {initials}
-              </div>
-              <span className="hidden md:block">{name}</span>
-              <ChevronDown
-                size={14}
-                className={`text-gray-400 transition-transform duration-150 ${dropdownOpen ? "rotate-180" : ""}`}
-              />
-            </button>
+          {isAuthenticated ? (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen((p) => !p)}
+                className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              >
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                  {initials}
+                </div>
+                <span className="hidden md:block">{name}</span>
+                <ChevronDown
+                  size={14}
+                  className={`text-gray-400 transition-transform duration-150 ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-            <AnimatePresence>
-              {dropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
-                  transition={{ duration: 0.12 }}
-                  className="absolute right-0 mt-1.5 w-44 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg py-1 text-sm"
-                >
-                  <button
-                    onClick={() => {
-                      setShowHelp(true);
-                      setDropdownOpen(false);
-                    }}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                    transition={{ duration: 0.12 }}
+                    className="absolute right-0 mt-1.5 w-44 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg py-1 text-sm"
                   >
-                    <span>❓</span> Help
-                  </button>
-                  <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setDropdownOpen(false);
-                    }}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                  >
-                    <span>↩</span> Sign out
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    <button
+                      onClick={() => {
+                        setShowHelp(true);
+                        setDropdownOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <span>❓</span> Help
+                    </button>
+                    <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setDropdownOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <span>↩</span> Sign out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowHelp(true)}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                Help
+              </button>
+              <Link
+                to="/login"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -161,13 +186,15 @@ export default function Navbar() {
             >
               Generate
             </Link>
-            <Link
-              to="/my-recipes"
-              onClick={() => setMenuOpen(false)}
-              className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              My Recipes
-            </Link>
+            {isAuthenticated && (
+              <Link
+                to="/my-recipes"
+                onClick={() => setMenuOpen(false)}
+                className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                My Recipes
+              </Link>
+            )}
 
             <div className="px-3 py-1">
               <DarkToggle />
@@ -185,15 +212,34 @@ export default function Navbar() {
 
             <div className="my-1 h-px bg-gray-100 dark:bg-gray-800" />
 
-            <button
-              onClick={() => {
-                handleLogout();
-                setMenuOpen(false);
-              }}
-              className="w-full text-left rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              ↩ Sign out
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                ↩ Sign out
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

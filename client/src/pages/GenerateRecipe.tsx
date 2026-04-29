@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import PageWrapper from "../components/PageWrapper";
 import IngredientInput from "../components/IngredientInput";
 import RecipeDetails from "../components/RecipeDetails";
@@ -10,6 +11,41 @@ import { INGREDIENTS } from "../utils/ingredientList";
 import { useRecipeActions } from "../hooks/useRecipeActions";
 import { toMessage } from "../utils/error";
 import type { Recipe, GenerateOptions } from "../types/recipe";
+
+const PENDING_RECIPE_STORAGE_KEY = "recipe-forge:pending-recipe";
+
+function readPendingRecipe(): Recipe | null {
+  try {
+    const stored = sessionStorage.getItem(PENDING_RECIPE_STORAGE_KEY);
+    if (!stored) return null;
+
+    const parsed = JSON.parse(stored) as Partial<Recipe>;
+    if (
+      typeof parsed.title === "string" &&
+      Array.isArray(parsed.ingredients) &&
+      typeof parsed.instructions === "string" &&
+      typeof parsed.calories === "number" &&
+      typeof parsed.protein === "number" &&
+      typeof parsed.fat === "number" &&
+      typeof parsed.carbs === "number"
+    ) {
+      return parsed as Recipe;
+    }
+  } catch {
+    // Ignore invalid session data and clear it below.
+  }
+
+  sessionStorage.removeItem(PENDING_RECIPE_STORAGE_KEY);
+  return null;
+}
+
+function storePendingRecipe(recipe: Recipe) {
+  sessionStorage.setItem(PENDING_RECIPE_STORAGE_KEY, JSON.stringify(recipe));
+}
+
+function clearPendingRecipe() {
+  sessionStorage.removeItem(PENDING_RECIPE_STORAGE_KEY);
+}
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
 function Toast({ message, visible }: { message: string; visible: boolean }) {
@@ -33,6 +69,7 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function GenerateRecipe() {
+  const navigate = useNavigate();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [options, setOptions] = useState<GenerateOptions>({
     servings: 2,
@@ -51,12 +88,21 @@ export default function GenerateRecipe() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { generate, save } = useRecipeActions();
+  const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   // Clean up toast timer on unmount
   useEffect(() => {
     return () => {
       if (toastTimer.current) clearTimeout(toastTimer.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const pendingRecipe = readPendingRecipe();
+    if (pendingRecipe) {
+      setRecipe((current) => current ?? pendingRecipe);
+      setSaved(false);
+    }
   }, []);
 
   const showToast = () => {
@@ -78,6 +124,11 @@ export default function GenerateRecipe() {
     try {
       const r = await generate(selectedIngredients, options);
       setRecipe(r);
+      if (isAuthenticated) {
+        clearPendingRecipe();
+      } else {
+        storePendingRecipe(r);
+      }
     } catch (e: unknown) {
       setError(toMessage(e, "Something went wrong"));
     } finally {
@@ -87,10 +138,18 @@ export default function GenerateRecipe() {
 
   const handleSave = async () => {
     if (!recipe || savingRef.current) return;
+
+    storePendingRecipe(recipe);
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
     savingRef.current = true;
     try {
       await save(recipe);
       setSaved(true);
+      clearPendingRecipe();
       showToast();
     } catch (e: unknown) {
       setError(toMessage(e, "Failed to save recipe"));
@@ -186,11 +245,30 @@ export default function GenerateRecipe() {
               <RecipeShimmer />
             </motion.div>
           ) : recipe ? (
-            <RecipeDetails
-              recipe={recipe}
-              onSave={handleSave}
-              disableSave={saved}
-            />
+            <div className="space-y-3">
+              {!isAuthenticated && (
+                <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200">
+                  <p className="font-semibold">Save this recipe after signing in.</p>
+                  <p className="mt-1 text-blue-700 dark:text-blue-300">
+                    Your generated recipe will stay here while you{" "}
+                    <Link to="/login" className="font-semibold underline">
+                      log in
+                    </Link>{" "}
+                    or{" "}
+                    <Link to="/register" className="font-semibold underline">
+                      create an account
+                    </Link>
+                    .
+                  </p>
+                </div>
+              )}
+              <RecipeDetails
+                recipe={recipe}
+                onSave={handleSave}
+                disableSave={saved}
+                saveLabel={isAuthenticated ? "Save Recipe" : "Sign in to Save"}
+              />
+            </div>
           ) : null}
         </AnimatePresence>
       </div>

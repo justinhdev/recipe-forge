@@ -15,14 +15,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route
-          path="/generate"
-          element={
-            <ProtectedRoute>
-              <GenerateRecipe />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/generate" element={<GenerateRecipe />} />
         <Route
           path="/my-recipes"
           element={

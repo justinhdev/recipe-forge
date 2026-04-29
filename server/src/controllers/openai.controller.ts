@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { getRecipeFromIngredients } from "../services/openai.service";
-import { getUserIdFromToken } from "../utils/getUserIdFromToken";
 import { GenerateRecipeBody } from "../schemas/openai.schema";
 import { recipeBodySchema } from "../schemas/recipe.schema";
 
@@ -18,11 +17,6 @@ export const generateRecipe = async (
     bravery,
     macroPreference,
   } = req.body as GenerateRecipeBody;
-  const userId = getUserIdFromToken(req);
-
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
 
   function sanitizeInstructions(instructions: string): string {
     return instructions

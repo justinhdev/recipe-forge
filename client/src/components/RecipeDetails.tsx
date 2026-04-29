@@ -11,6 +11,7 @@ type Props = {
   onSave?: () => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   disableSave?: boolean;
+  saveLabel?: string;
 };
 
 export default function RecipeDetails({
@@ -18,6 +19,7 @@ export default function RecipeDetails({
   onSave,
   onDelete,
   disableSave,
+  saveLabel = "Save Recipe",
 }: Props) {
   const [showMacros, setShowMacros] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -112,7 +114,7 @@ export default function RecipeDetails({
             }`}
           >
             {disableSave && <CheckCircle2 size={14} />}
-            {disableSave ? "Saved" : saving ? "Saving…" : "Save Recipe"}
+            {disableSave ? "Saved" : saving ? "Saving…" : saveLabel}
           </button>
         )}
       </div>

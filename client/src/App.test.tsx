@@ -1,19 +1,36 @@
 /**
  * @vitest-environment jsdom
  */
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
 
 describe("App routes", () => {
-  beforeEach(() => {
-    localStorage.clear();
+  afterEach(() => {
+    cleanup();
   });
 
-  it("redirects protected routes to login when no token exists", async () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it("allows guests to open the generate route", async () => {
     render(
       <MemoryRouter initialEntries={["/generate"]}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.findByRole("heading", { name: "Generate a Recipe" })
+    ).toBeTruthy();
+  });
+
+  it("redirects saved recipes to login when no token exists", async () => {
+    render(
+      <MemoryRouter initialEntries={["/my-recipes"]}>
         <App />
       </MemoryRouter>
     );

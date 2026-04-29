@@ -53,7 +53,7 @@ export default function Landing() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              to="/register"
+              to="/generate"
               className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 dark:shadow-none dark:hover:bg-blue-500"
             >
               Generate Your First Recipe →
