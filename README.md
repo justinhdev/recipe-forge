@@ -3,11 +3,7 @@
 [![CI passing](https://github.com/justinhdev/recipe-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/justinhdev/recipe-forge/actions/workflows/ci.yml)
 
 <p align="center">
-  AI-powered recipe generator built with <strong>React</strong>, <strong>TypeScript</strong>, <strong>Node.js/Express</strong>, <strong>PostgreSQL</strong>, and <strong>Prisma</strong>.
-</p>
-
-<p align="center">
-  Generate structured recipes from available ingredients, tailor outputs with nutrition and cuisine preferences, and save results to a personal dashboard.
+  <strong>Full-stack AI recipe generator with structured OpenAI outputs, validated API contracts, authenticated persistence, and production-style observability.</strong>
 </p>
 
 <p align="center">
@@ -23,52 +19,61 @@
   <img alt="Express" src="https://img.shields.io/badge/Express-API-000000?logo=express&logoColor=white" />
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white" />
   <img alt="Prisma" src="https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white" />
-  <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-LLM%20Integration-412991" />
+  <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-Structured%20Outputs-412991" />
 </p>
 
 ---
 
 ## Overview
 
-Recipe Forge is a full-stack web application that turns user-selected ingredients into structured recipes with macro breakdowns using the OpenAI API. Users can tailor recipe generation with options like servings, diet, cuisine, meal type, macro preference, and creativity level, then save recipes to their account for later access.
+Recipe Forge turns a user's available ingredients into structured recipes with macro breakdowns. Users can tune generation by servings, diet, cuisine, meal type, macro priority, and creativity level, then save generated recipes to an authenticated dashboard.
 
-This project was built to deepen hands-on experience with modern full-stack development, especially:
-- TypeScript across frontend and backend
-- API design with Express
-- PostgreSQL data modeling with Prisma
-- JWT authentication and protected routes
-- integrating structured LLM outputs into an app workflow
-- runtime validation with Zod across request and response boundaries
+The project is built as a production-style full-stack application rather than a thin AI demo. The backend validates user input and OpenAI responses with Zod, persists user recipes and generation metrics in PostgreSQL, emits structured JSON logs with request correlation IDs, and exposes a protected internal stats dashboard for monitoring the OpenAI workflow.
 
----
+## Highlights
 
-## Features
+- Full-stack TypeScript application with React, Tailwind CSS, Express, Prisma, and PostgreSQL
+- OpenAI structured output integration with runtime validation before responses reach the UI
+- JWT authentication for saved recipe create, list, and delete flows
+- Durable AI generation metrics for success/failure status, latency, token usage, estimated cost, model, prompt version, and validation failures
+- Pino structured API logs written to stdout for Render log ingestion, with per-request correlation IDs
+- Protected internal admin dashboard for total generations, success rate, p50/p95 latency, estimated cost, model usage, recent requests, and failure reasons
+- Integration and unit tests covering auth, recipe CRUD, rate limiting, JWT helpers, OpenAI prompt behavior, and admin metric aggregation
+- Deployed with Vercel, Render, Neon PostgreSQL, Prisma migrations, and GitHub Actions CI
 
-- Ingredient-driven recipe generation with structured macro output
-- Configurable servings, diet, cuisine, meal type, macro priority, and creativity level
-- JWT-based authentication with protected routes for saved recipes
-- Rate limiting on authentication and AI generation routes
-- Structured API logging with request correlation IDs
-- Durable AI generation metrics for latency, status, token usage, and estimated cost
-- Protected internal stats dashboard for monitoring the OpenAI integration
-- Persistent recipe storage with authenticated create, list, and delete flows
-- Zod validation across request bodies, route params, and OpenAI response parsing
-- Shared frontend contract types aligned with backend request and response shapes
-- API test coverage with Vitest and Supertest
-- Responsive React UI with loading, error, and empty states
+## Product Screenshots
 
----
+### Recipe Generation Workflow
+
+<p align="center">
+  <img src="./assets/Generate.png" alt="Recipe Forge recipe generation workflow" width="900" />
+</p>
+
+### Saved Recipes Dashboard
+
+<p align="center">
+  <img src="./assets/Saved.png" alt="Recipe Forge saved recipes dashboard" width="900" />
+</p>
+
+### Admin Observability Dashboard
+
+<p align="center">
+  <img src="./assets/Stats.png" alt="Recipe Forge admin observability dashboard" width="900" />
+</p>
 
 ## Tech Stack
 
 ### Frontend
+
 - React
 - TypeScript
 - Tailwind CSS
 - Framer Motion
 - Axios
+- Vite
 
 ### Backend
+
 - Node.js
 - Express
 - TypeScript
@@ -81,120 +86,104 @@ This project was built to deepen hands-on experience with modern full-stack deve
 - Vitest
 - Supertest
 
----
+### Deployment
+
+- Frontend: Vercel
+- API: Render
+- Database: Neon PostgreSQL
+- CI: GitHub Actions
 
 ## Architecture
 
-Recipe Forge is split into two applications:
-
 ```text
 recipe-forge/
-├── client/   # React frontend
+├── client/   # React + TypeScript frontend
 └── server/   # Express API + Prisma + PostgreSQL
 ```
 
-### Frontend responsibilities
-- ingredient selection and recipe options UI
-- sending recipe-generation requests
-- displaying generated recipe results
-- saving recipes for authenticated users
+### Request Flow
 
-### Backend responsibilities
-- user registration and login
-- JWT authentication and protected routes
-- request validation with Zod middleware
-- OpenAI-powered recipe generation with structured output validation
-- pino-powered JSON request logs written to stdout for Render log ingestion
-- durable RecipeGeneration metrics in PostgreSQL for latency, status, token usage, estimated cost, and validation failures
-- protected admin stats endpoint for generation success rate, p50/p95 latency, cost, model usage, and failure reasons
-- automated integration and unit tests for API behavior and helper logic
-- recipe persistence with Prisma and PostgreSQL
+1. The user selects ingredients and generation options in the React UI.
+2. The frontend sends a typed request to the Express API.
+3. The backend validates the request body with Zod.
+4. The backend builds a constrained OpenAI prompt and requests a structured recipe response.
+5. The OpenAI response is parsed and validated against a Zod schema.
+6. The API sanitizes and validates the final response body before returning it.
+7. The backend records generation metrics, including latency, status, token usage, estimated cost, model, prompt version, and any validation failures.
+8. Authenticated users can save generated recipes and manage them later.
 
-### Deployment
-- frontend hosted on Vercel
-- Express API hosted on Render
-- PostgreSQL hosted on Neon
+### Observability
 
----
+Recipe Forge includes a lightweight observability layer for the AI workflow:
 
-## How It Works
+- `pino` emits structured JSON request logs to stdout, which Render captures automatically.
+- Each request receives a correlation ID exposed through the `X-Request-Id` response header.
+- OpenAI generation attempts are persisted in the `RecipeGeneration` table.
+- The protected `/api/admin/stats` endpoint aggregates operational metrics for the admin dashboard.
+- The `/admin/stats` page displays total generations, success rate, p50/p95 latency, estimated cost, model usage, failure reasons, and recent requests.
 
-1. A user selects ingredients and optional recipe preferences.
-2. The frontend sends a request to the Express API.
-3. The backend validates the request body with Zod before any controller logic runs.
-4. The backend builds a prompt and sends it to the OpenAI API.
-5. The OpenAI response is parsed as structured output and validated against a Zod schema.
-6. The generated recipe is validated again against the API response shape, then returned to the frontend.
-7. Authenticated users can save recipes and manage them later.
+Cost is estimated from token usage returned by the OpenAI API response and configurable per-million-token prices:
 
-### Validation flow
+```env
+OPENAI_INPUT_COST_PER_1M=2.50
+OPENAI_OUTPUT_COST_PER_1M=10.00
+```
 
-- `server/src/schemas/` contains the request and OpenAI response schemas
-- `server/src/middleware/validate.middleware.ts` validates request bodies and params at the route layer
-- `server/src/middleware/error.middleware.ts` converts `ZodError`s into clean `400` responses
-- `client/src/types/contracts.ts` mirrors the API contracts used by the frontend
+### Validation
 
-### Testing flow
-
-- `server/src/test/auth.integration.test.ts` covers auth registration and login behavior
-- `server/src/test/recipes.integration.test.ts` covers authenticated recipe create/list/delete behavior
-- `server/src/test/openai.service.unit.test.ts` mocks OpenAI and tests prompt-building behavior without hitting the real API
-- `server/src/test/jwt.utils.unit.test.ts` covers JWT helper behavior
-- `server/src/test/admin.integration.test.ts` covers protected access and metric aggregation for the admin stats endpoint
-- `server/src/test/test-env.ts` rewrites the Prisma connection to use a dedicated Postgres `test` schema
-- `server/src/test/setup.ts` runs `prisma db push` automatically and clears test data between runs
-
----
+- `server/src/schemas/` defines request, route param, recipe, and OpenAI response schemas.
+- `server/src/middleware/validate.middleware.ts` validates request bodies and params at the route layer.
+- `server/src/middleware/error.middleware.ts` returns consistent API errors and logs structured failures.
+- `client/src/types/contracts.ts` mirrors backend request and response contracts used by the frontend.
 
 ## API Routes
 
 ### Auth
+
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 
 ### AI
+
 - `POST /api/ai/generate`
 
 ### Recipes
+
 - `GET /api/recipes`
 - `POST /api/recipes`
 - `DELETE /api/recipes/:id`
 
 ### Admin
+
 - `GET /api/admin/stats`
 
-The admin stats endpoint is protected by JWT auth. If `ADMIN_EMAILS` is set, only users whose email appears in that comma-separated list can access it.
+The admin stats endpoint requires JWT authentication. If `ADMIN_EMAILS` is set, only users whose email appears in that comma-separated list can access it.
 
----
+## Testing
 
-## Screenshots
+Server tests use Vitest and Supertest:
 
-<h3 align="center">Recipe Generation Workflow</h3>
-<p align="center">
-  <img src="./assets/Generate.png" alt="Recipe Generation Workflow" width="900" />
-</p>
+- `auth.integration.test.ts` covers registration, login, duplicate email handling, and invalid credentials.
+- `recipes.integration.test.ts` covers authenticated recipe create, list, and delete behavior.
+- `rate-limit.integration.test.ts` covers auth and AI generation rate limits.
+- `openai.service.unit.test.ts` mocks OpenAI and verifies prompt construction and refusal handling.
+- `jwt.utils.unit.test.ts` covers JWT helper behavior.
+- `admin.integration.test.ts` covers protected stats access and metric aggregation.
 
-<h3 align="center">Saved Recipes Dashboard</h3>
-<p align="center">
-  <img src="./assets/Saved.png" alt="Saved Recipes Dashboard" width="900" />
-</p>
+The server test suite uses `TEST_DATABASE_URL`, rewrites it to a dedicated `test` schema, runs `prisma db push`, and clears data between test runs.
 
-<h3 align="center">Recipe Detail Modal with Macro Breakdown</h3>
-<p align="center">
-  <img src="./assets/SavedModal.png" alt="Recipe Detail Modal with Macro Breakdown" width="900" />
-</p>
-
----
+Client tests cover core UI and utility behavior with Vitest and React Testing Library.
 
 ## Local Development
 
 ### Prerequisites
+
 - Node.js
 - npm
 - PostgreSQL
 - OpenAI API key
 
-### Environment variables
+### Environment Variables
 
 `server/.env`
 
@@ -217,25 +206,31 @@ PORT=3000
 VITE_API_URL=http://localhost:3000
 ```
 
-### Run locally
+### Install and Run
 
 ```bash
 git clone https://github.com/justinhdev/recipe-forge.git
 cd recipe-forge
-cd client && npm install
-cd ../server && npm install
+```
+
+Install and start the API:
+
+```bash
+cd server
+npm install
 npx prisma migrate dev
 npm run dev
 ```
 
-In a second terminal:
+In a second terminal, install and start the frontend:
 
 ```bash
 cd client
+npm install
 npm run dev
 ```
 
-### Tests
+### Run Tests
 
 From `server/`:
 
@@ -243,10 +238,16 @@ From `server/`:
 npm test
 ```
 
-The server test suite requires `TEST_DATABASE_URL`, rewrites it to use a separate Postgres schema named `test`, runs `prisma db push`, and clears data between test runs.
-
 From `client/`:
 
 ```bash
 npm test
+```
+
+### Production Migration
+
+Render should run Prisma migrations before starting the API:
+
+```bash
+npx prisma migrate deploy && npm run start
 ```
