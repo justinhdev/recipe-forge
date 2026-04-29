@@ -48,6 +48,9 @@ This project was built to deepen hands-on experience with modern full-stack deve
 - Configurable servings, diet, cuisine, meal type, macro priority, and creativity level
 - JWT-based authentication with protected routes for saved recipes
 - Rate limiting on authentication and AI generation routes
+- Structured API logging with request correlation IDs
+- Durable AI generation metrics for latency, status, token usage, and estimated cost
+- Protected internal stats dashboard for monitoring the OpenAI integration
 - Persistent recipe storage with authenticated create, list, and delete flows
 - Zod validation across request bodies, route params, and OpenAI response parsing
 - Shared frontend contract types aligned with backend request and response shapes
@@ -74,6 +77,7 @@ This project was built to deepen hands-on experience with modern full-stack deve
 - JWT authentication
 - OpenAI API
 - Zod
+- Pino
 - Vitest
 - Supertest
 
@@ -100,6 +104,9 @@ recipe-forge/
 - JWT authentication and protected routes
 - request validation with Zod middleware
 - OpenAI-powered recipe generation with structured output validation
+- pino-powered JSON request logs written to stdout for Render log ingestion
+- durable RecipeGeneration metrics in PostgreSQL for latency, status, token usage, estimated cost, and validation failures
+- protected admin stats endpoint for generation success rate, p50/p95 latency, cost, model usage, and failure reasons
 - automated integration and unit tests for API behavior and helper logic
 - recipe persistence with Prisma and PostgreSQL
 
@@ -133,6 +140,7 @@ recipe-forge/
 - `server/src/test/recipes.integration.test.ts` covers authenticated recipe create/list/delete behavior
 - `server/src/test/openai.service.unit.test.ts` mocks OpenAI and tests prompt-building behavior without hitting the real API
 - `server/src/test/jwt.utils.unit.test.ts` covers JWT helper behavior
+- `server/src/test/admin.integration.test.ts` covers protected access and metric aggregation for the admin stats endpoint
 - `server/src/test/test-env.ts` rewrites the Prisma connection to use a dedicated Postgres `test` schema
 - `server/src/test/setup.ts` runs `prisma db push` automatically and clears test data between runs
 
@@ -151,6 +159,11 @@ recipe-forge/
 - `GET /api/recipes`
 - `POST /api/recipes`
 - `DELETE /api/recipes/:id`
+
+### Admin
+- `GET /api/admin/stats`
+
+The admin stats endpoint is protected by JWT auth. If `ADMIN_EMAILS` is set, only users whose email appears in that comma-separated list can access it.
 
 ---
 
@@ -191,6 +204,9 @@ TEST_DATABASE_URL=your_test_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-2024-08-06
+OPENAI_INPUT_COST_PER_1M=2.50
+OPENAI_OUTPUT_COST_PER_1M=10.00
+ADMIN_EMAILS=you@example.com
 CLIENT_URL=http://localhost:5173
 PORT=3000
 ```

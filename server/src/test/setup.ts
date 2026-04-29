@@ -23,12 +23,14 @@ beforeAll(async () => {
 beforeEach(async () => {
   if (!databaseReady) return;
   resetRateLimitersForTest();
+  await prisma.recipeGeneration.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.user.deleteMany();
 });
 
 afterAll(async () => {
   if (!databaseReady) return;
+  await prisma.recipeGeneration.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.user.deleteMany();
   await prisma.$disconnect();

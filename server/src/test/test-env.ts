@@ -14,5 +14,6 @@ testDatabaseUrl.searchParams.set("schema", "test");
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || "test-openai-key";
+process.env.ADMIN_EMAILS = "";
 process.env.DATABASE_URL = testDatabaseUrl.toString();
 process.env.TEST_DATABASE_URL = testDatabaseUrl.toString();

@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique
-  password String
-  recipes  Recipe[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  email             String             @unique
+  password          String
+  recipes           Recipe[]
+  recipeGenerations RecipeGeneration[]
 }
 
 model Recipe {
@@ -27,4 +28,32 @@ model Recipe {
   createdAt    DateTime @default(now())
   user         User     @relation(fields: [userId], references: [id])
   userId       Int
+}
+
+enum GenerationStatus {
+  SUCCESS
+  FAILURE
+}
+
+model RecipeGeneration {
+  id                 Int              @id @default(autoincrement())
+  requestId          String?
+  inputHash          String
+  promptVersion      String
+  model              String
+  status             GenerationStatus
+  latencyMs          Int
+  promptTokens       Int?
+  completionTokens   Int?
+  totalTokens        Int?
+  estimatedCostUsd   Float?
+  failureReason      String?
+  validationFailures Json?
+  createdAt          DateTime         @default(now())
+  user               User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId             Int?
+
+  @@index([createdAt])
+  @@index([inputHash])
+  @@index([status])
 }

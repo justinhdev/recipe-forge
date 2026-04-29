@@ -7,13 +7,26 @@ import {
   openAIRecipeSchema,
 } from "../schemas/openai.schema";
 
+export const RECIPE_PROMPT_VERSION = "recipe-v1";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const getRecipeFromIngredients = async (
+export type OpenAIRecipeGeneration = {
+  recipe: OpenAIRecipe;
+  model: string;
+  promptVersion: string;
+  tokenUsage?: {
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+  };
+};
+
+export const generateRecipeWithMetadata = async (
   options: GenerateRecipeBody
-): Promise<OpenAIRecipe> => {
+): Promise<OpenAIRecipeGeneration> => {
   const {
     ingredients,
     servings = 2,
@@ -78,8 +91,10 @@ INGREDIENTS: ${ingredients.join(", ")}
 
   const temperature = bravery ? Math.min(Math.max(bravery, 0), 1.5) : 0.7;
 
+  const model = process.env.OPENAI_MODEL || "gpt-4o-2024-08-06";
+
   const response = await openai.chat.completions.parse({
-    model: process.env.OPENAI_MODEL || "gpt-4o-2024-08-06",
+    model,
     messages: [{ role: "user", content: prompt }],
     response_format: zodResponseFormat(openAIRecipeSchema, "recipe"),
     temperature,
@@ -88,6 +103,7 @@ INGREDIENTS: ${ingredients.join(", ")}
 
   const message = response.choices[0]?.message;
   const parsedRecipe = message?.parsed;
+  const usage = response.usage;
 
   if (!parsedRecipe) {
     if (message?.refusal) {
@@ -99,5 +115,23 @@ INGREDIENTS: ${ingredients.join(", ")}
     throw new AppError("OpenAI returned an invalid recipe response", 502);
   }
 
-  return openAIRecipeSchema.parse(parsedRecipe);
+  return {
+    recipe: openAIRecipeSchema.parse(parsedRecipe),
+    model,
+    promptVersion: RECIPE_PROMPT_VERSION,
+    tokenUsage: usage
+      ? {
+          promptTokens: usage.prompt_tokens,
+          completionTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens,
+        }
+      : undefined,
+  };
+};
+
+export const getRecipeFromIngredients = async (
+  options: GenerateRecipeBody
+): Promise<OpenAIRecipe> => {
+  const { recipe } = await generateRecipeWithMetadata(options);
+  return recipe;
 };
