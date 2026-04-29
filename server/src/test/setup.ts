@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach } from "vitest";
 import { execSync } from "node:child_process";
 import "./test-env";
 import prisma from "../prisma";
+import { resetRateLimitersForTest } from "../middleware/rateLimit.middleware";
 
 let databaseReady = false;
 
@@ -21,6 +22,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   if (!databaseReady) return;
+  resetRateLimitersForTest();
   await prisma.recipe.deleteMany();
   await prisma.user.deleteMany();
 });

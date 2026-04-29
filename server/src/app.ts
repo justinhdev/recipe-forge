@@ -7,6 +7,8 @@ import { errorHandler } from "./middleware/error.middleware";
 
 export const app = express();
 
+app.set("trust proxy", 1);
+
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim())

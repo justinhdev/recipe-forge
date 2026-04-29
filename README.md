@@ -47,6 +47,7 @@ This project was built to deepen hands-on experience with modern full-stack deve
 - Ingredient-driven recipe generation with structured macro output
 - Configurable servings, diet, cuisine, meal type, macro priority, and creativity level
 - JWT-based authentication with protected routes for saved recipes
+- Rate limiting on authentication and AI generation routes
 - Persistent recipe storage with authenticated create, list, and delete flows
 - Zod validation across request bodies, route params, and OpenAI response parsing
 - Shared frontend contract types aligned with backend request and response shapes
