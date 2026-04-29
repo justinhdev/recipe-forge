@@ -1,16 +1,21 @@
 /**
  * @vitest-environment jsdom
  */
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GenerateRecipe from "./GenerateRecipe";
 
+const { generateMock, saveMock } = vi.hoisted(() => ({
+  generateMock: vi.fn(),
+  saveMock: vi.fn(),
+}));
+
 vi.mock("../hooks/useRecipeActions", () => ({
   useRecipeActions: () => ({
-    generate: vi.fn(),
-    save: vi.fn(),
+    generate: generateMock,
+    save: saveMock,
   }),
 }));
 
@@ -30,6 +35,8 @@ describe("GenerateRecipe", () => {
   });
 
   beforeEach(() => {
+    generateMock.mockReset();
+    saveMock.mockReset();
     localStorage.clear();
     sessionStorage.clear();
   });
@@ -58,5 +65,37 @@ describe("GenerateRecipe", () => {
     expect(
       await screen.findByRole("heading", { name: "Login Route" })
     ).toBeTruthy();
+    expect(sessionStorage.getItem("recipe-forge:pending-save-intent")).toBe(
+      "true"
+    );
+  });
+
+  it("automatically saves a guest recipe after sign in when save was requested", async () => {
+    localStorage.setItem("token", "test-token");
+    sessionStorage.setItem(
+      "recipe-forge:pending-recipe",
+      JSON.stringify(pendingRecipe)
+    );
+    sessionStorage.setItem("recipe-forge:pending-save-intent", "true");
+    saveMock.mockResolvedValue(undefined);
+
+    render(
+      <MemoryRouter initialEntries={["/generate"]}>
+        <Routes>
+          <Route path="/generate" element={<GenerateRecipe />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText("Test Recipe")).toBeTruthy();
+
+    await waitFor(() => {
+      expect(saveMock).toHaveBeenCalledWith(pendingRecipe);
+    });
+    expect(sessionStorage.getItem("recipe-forge:pending-recipe")).toBeNull();
+    expect(
+      sessionStorage.getItem("recipe-forge:pending-save-intent")
+    ).toBeNull();
+    expect(await screen.findByRole("button", { name: "Saved" })).toBeTruthy();
   });
 });

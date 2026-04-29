@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import PageWrapper from "../components/PageWrapper";
@@ -13,6 +13,7 @@ import { toMessage } from "../utils/error";
 import type { Recipe, GenerateOptions } from "../types/recipe";
 
 const PENDING_RECIPE_STORAGE_KEY = "recipe-forge:pending-recipe";
+const PENDING_SAVE_INTENT_STORAGE_KEY = "recipe-forge:pending-save-intent";
 
 function readPendingRecipe(): Recipe | null {
   try {
@@ -45,6 +46,18 @@ function storePendingRecipe(recipe: Recipe) {
 
 function clearPendingRecipe() {
   sessionStorage.removeItem(PENDING_RECIPE_STORAGE_KEY);
+}
+
+function storePendingSaveIntent() {
+  sessionStorage.setItem(PENDING_SAVE_INTENT_STORAGE_KEY, "true");
+}
+
+function hasPendingSaveIntent() {
+  return sessionStorage.getItem(PENDING_SAVE_INTENT_STORAGE_KEY) === "true";
+}
+
+function clearPendingSaveIntent() {
+  sessionStorage.removeItem(PENDING_SAVE_INTENT_STORAGE_KEY);
 }
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
@@ -85,10 +98,17 @@ export default function GenerateRecipe() {
   const [saved, setSaved] = useState(false);
   const [toast, setToast] = useState(false);
   const savingRef = useRef(false);
+  const restoredSaveAttemptedRef = useRef(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { generate, save } = useRecipeActions();
   const isAuthenticated = Boolean(localStorage.getItem("token"));
+
+  const showToast = useCallback(() => {
+    setToast(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(false), 3000);
+  }, []);
 
   // Clean up toast timer on unmount
   useEffect(() => {
@@ -105,11 +125,42 @@ export default function GenerateRecipe() {
     }
   }, []);
 
-  const showToast = () => {
-    setToast(true);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(false), 3000);
-  };
+  useEffect(() => {
+    if (
+      !isAuthenticated ||
+      savingRef.current ||
+      restoredSaveAttemptedRef.current ||
+      !hasPendingSaveIntent()
+    ) {
+      return;
+    }
+
+    const pendingRecipe = readPendingRecipe();
+    if (!pendingRecipe) {
+      clearPendingSaveIntent();
+      return;
+    }
+
+    restoredSaveAttemptedRef.current = true;
+    savingRef.current = true;
+    setRecipe((current) => current ?? pendingRecipe);
+    setError("");
+
+    save(pendingRecipe)
+      .then(() => {
+        setSaved(true);
+        clearPendingRecipe();
+        clearPendingSaveIntent();
+        showToast();
+      })
+      .catch((e: unknown) => {
+        setError(toMessage(e, "Failed to save recipe"));
+        restoredSaveAttemptedRef.current = false;
+      })
+      .finally(() => {
+        savingRef.current = false;
+      });
+  }, [isAuthenticated, save, showToast]);
 
   const handleSurpriseMe = () => {
     const shuffled = [...INGREDIENTS].sort(() => 0.5 - Math.random());
@@ -121,6 +172,7 @@ export default function GenerateRecipe() {
     setError("");
     setRecipe(null);
     setSaved(false);
+    clearPendingSaveIntent();
     try {
       const r = await generate(selectedIngredients, options);
       setRecipe(r);
@@ -141,6 +193,7 @@ export default function GenerateRecipe() {
 
     storePendingRecipe(recipe);
     if (!isAuthenticated) {
+      storePendingSaveIntent();
       navigate("/login");
       return;
     }
@@ -150,6 +203,7 @@ export default function GenerateRecipe() {
       await save(recipe);
       setSaved(true);
       clearPendingRecipe();
+      clearPendingSaveIntent();
       showToast();
     } catch (e: unknown) {
       setError(toMessage(e, "Failed to save recipe"));
