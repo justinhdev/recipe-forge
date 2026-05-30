@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import type { FormEvent } from "react";
 import type { LoginUserRequest, RegisterUserRequest } from "../types/contracts";
 import api from "../utils/api";
+import { storeAuth } from "../utils/auth";
 import { Anvil } from "lucide-react";
 
 type Props = {
@@ -37,9 +38,8 @@ export default function AuthForm({ isLogin = false }: Props) {
 
     try {
       const res = await api.post<AuthResponse>(url, payload);
-      localStorage.setItem("token", res.data.token);
       const displayName = res.data.name ?? (!isLogin ? name : "");
-      if (displayName) localStorage.setItem("name", displayName);
+      storeAuth({ token: res.data.token, name: displayName });
       navigate("/generate");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {

@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GenerateRecipe from "./GenerateRecipe";
+import { makeTestJwt } from "../test/auth";
 
 const { generateMock, saveMock } = vi.hoisted(() => ({
   generateMock: vi.fn(),
@@ -71,7 +72,7 @@ describe("GenerateRecipe", () => {
   });
 
   it("automatically saves a guest recipe after sign in when save was requested", async () => {
-    localStorage.setItem("token", "test-token");
+    localStorage.setItem("token", makeTestJwt());
     sessionStorage.setItem(
       "recipe-forge:pending-recipe",
       JSON.stringify(pendingRecipe)

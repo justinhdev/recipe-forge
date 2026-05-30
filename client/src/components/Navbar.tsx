@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Anvil, ChevronDown } from "lucide-react";
 import DarkToggle from "./DarkToggle";
 import HelpModal from "./HelpModal";
+import { clearStoredAuth, hasValidStoredToken } from "../utils/auth";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+  const isAuthenticated = hasValidStoredToken();
 
   const name = localStorage.getItem("name") ?? "Account";
   const initials = name
@@ -23,8 +24,7 @@ export default function Navbar() {
     .toUpperCase();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("name");
+    clearStoredAuth();
     navigate("/login");
   };
 

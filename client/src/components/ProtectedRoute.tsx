@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { hasValidStoredToken } from "../utils/auth";
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const token = localStorage.getItem("token");
-  return <>{token ? children : <Navigate to="/login" />}</>;
+  return <>{hasValidStoredToken() ? children : <Navigate to="/login" />}</>;
 }

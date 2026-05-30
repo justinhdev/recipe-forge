@@ -10,6 +10,7 @@ import { Wand2, CheckCircle2 } from "lucide-react";
 import { INGREDIENTS } from "../utils/ingredientList";
 import { useRecipeActions } from "../hooks/useRecipeActions";
 import { toMessage } from "../utils/error";
+import { hasValidStoredToken } from "../utils/auth";
 import type { Recipe, GenerateOptions } from "../types/recipe";
 
 const PENDING_RECIPE_STORAGE_KEY = "recipe-forge:pending-recipe";
@@ -102,7 +103,7 @@ export default function GenerateRecipe() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { generate, save } = useRecipeActions();
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+  const isAuthenticated = hasValidStoredToken();
 
   const showToast = useCallback(() => {
     setToast(true);
