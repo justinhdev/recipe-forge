@@ -20,7 +20,12 @@ export const validate =
       }
 
       if (schemas.query) {
-        req.query = schemas.query.parse(req.query);
+        Object.defineProperty(req, "query", {
+          value: schemas.query.parse(req.query),
+          configurable: true,
+          enumerable: true,
+          writable: true,
+        });
       }
 
       next();

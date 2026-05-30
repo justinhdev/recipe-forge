@@ -24,6 +24,8 @@ beforeEach(async () => {
   if (!databaseReady) return;
   resetRateLimitersForTest();
   await prisma.recipeGeneration.deleteMany();
+  await prisma.dailyTarget.deleteMany();
+  await prisma.foodLog.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.user.deleteMany();
 });
@@ -31,6 +33,8 @@ beforeEach(async () => {
 afterAll(async () => {
   if (!databaseReady) return;
   await prisma.recipeGeneration.deleteMany();
+  await prisma.dailyTarget.deleteMany();
+  await prisma.foodLog.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.user.deleteMany();
   await prisma.$disconnect();
