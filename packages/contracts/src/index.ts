@@ -44,6 +44,16 @@ export type DeleteFoodLogResponse = {
   message: string;
 };
 
+export type LoginUserRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginUserResponse = {
+  token: string;
+  name: string;
+};
+
 export type GetDailyTargetResponse = DailyTarget | null;
 export type UpdateDailyTargetRequest = {
   calories: number;
