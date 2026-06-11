@@ -36,15 +36,15 @@ export default function TodayScreen() {
       queryClient.invalidateQueries({ queryKey: ["foodLogs", today] }),
   });
 
-  const logs = logsQuery.data ?? [];
+  const logs = useMemo(() => logsQuery.data ?? [], [logsQuery.data]);
   const target = targetQuery.data ?? null;
   const totals = useMemo(() => sumFoodLogs(logs), [logs]);
 
-  async function handleSignOut() {
+  const handleSignOut = async () => {
     await signOut();
     queryClient.clear();
     router.replace("/login");
-  }
+  };
 
   if (isAuthLoading) {
     return (

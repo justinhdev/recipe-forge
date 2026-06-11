@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit() {
+  const handleSubmit = async () => {
     setError(null);
     setIsSubmitting(true);
 
@@ -32,7 +32,7 @@ export default function LoginScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   if (!isLoading && isAuthenticated) {
     return <Redirect href="/today" />;

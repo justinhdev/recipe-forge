@@ -16,7 +16,7 @@ export default function RootLayout() {
             staleTime: 30_000,
           },
         },
-      }),
+      })
   );
 
   return (

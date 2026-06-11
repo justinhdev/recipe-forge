@@ -97,8 +97,11 @@ The project is built as a production-style full-stack application rather than a 
 
 ```text
 recipe-forge/
-├── client/   # React + TypeScript frontend
-└── server/   # Express API + Prisma + PostgreSQL
+├── client/     # React + TypeScript frontend
+├── server/     # Express API + Prisma + PostgreSQL
+├── app/        # Expo mobile app (in development)
+└── packages/
+    └── contracts/   # Shared API request/response types
 ```
 
 ### Request Flow
@@ -136,6 +139,26 @@ OPENAI_OUTPUT_COST_PER_1M=10.00
 - `server/src/middleware/error.middleware.ts` returns consistent API errors and logs structured failures.
 - `client/src/types/contracts.ts` mirrors backend request and response contracts used by the frontend.
 
+## Mobile App (In Development)
+
+The `app/` directory contains an Expo mobile app for daily food logging against the same API. It is functional but still in active development and not yet released.
+
+- Expo with expo-router file-based navigation
+- TanStack Query for server state and cache invalidation
+- JWT storage with `expo-secure-store` (falls back to `localStorage` on web)
+- Shares request/response types with the backend through `@recipe-forge/contracts`
+- Linted, typechecked, and unit tested in CI alongside the web packages
+
+To run it, copy `app/.env.example` to `app/.env`, point `EXPO_PUBLIC_API_BASE_URL` at your machine's LAN address for the API, then:
+
+```bash
+cd app
+npm install
+npm start
+```
+
+The shared `packages/contracts` package is the long-term home for API contracts; `client/src/types/contracts.ts` still defines the web client's copy and will migrate over.
+
 ## API Routes
 
 ### Auth
@@ -152,6 +175,17 @@ OPENAI_OUTPUT_COST_PER_1M=10.00
 - `GET /api/recipes`
 - `POST /api/recipes`
 - `DELETE /api/recipes/:id`
+
+### Food Logs
+
+- `GET /api/logs?date=YYYY-MM-DD`
+- `POST /api/logs`
+- `DELETE /api/logs/:id`
+
+### Daily Targets
+
+- `GET /api/targets`
+- `PUT /api/targets`
 
 ### Admin
 
@@ -172,7 +206,7 @@ Server tests use Vitest and Supertest:
 
 The server test suite uses `TEST_DATABASE_URL`, rewrites it to a dedicated `test` schema, runs `prisma db push`, and clears data between test runs.
 
-Client tests cover core UI and utility behavior with Vitest and React Testing Library.
+Client tests cover core UI and utility behavior with Vitest and React Testing Library. The mobile app covers its date and nutrition utilities with Vitest.
 
 ## Local Development
 

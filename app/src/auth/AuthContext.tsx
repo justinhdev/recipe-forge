@@ -51,7 +51,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setToken(null);
       },
     }),
-    [isLoading, token],
+    [isLoading, token]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

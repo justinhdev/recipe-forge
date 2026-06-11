@@ -7,14 +7,13 @@ export type NutritionTotals = {
   fat: number;
 };
 
-export function sumFoodLogs(logs: FoodLog[]): NutritionTotals {
-  return logs.reduce<NutritionTotals>(
+export const sumFoodLogs = (logs: FoodLog[]): NutritionTotals =>
+  logs.reduce<NutritionTotals>(
     (totals, log) => ({
       calories: totals.calories + log.calories,
       protein: totals.protein + log.protein,
       carbs: totals.carbs + log.carbs,
       fat: totals.fat + log.fat,
     }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
-}

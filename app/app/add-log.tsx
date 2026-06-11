@@ -33,7 +33,7 @@ const initialForm: FoodForm = {
   fat: "",
 };
 
-function isValidMacroInput(value: string) {
+const isValidMacroInput = (value: string) => {
   const trimmed = value.trim();
   const parsed = Number(trimmed);
 
@@ -43,7 +43,7 @@ function isValidMacroInput(value: string) {
     parsed >= 0 &&
     parsed <= 10000
   );
-}
+};
 
 export default function AddLogScreen() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -66,14 +66,14 @@ export default function AddLogScreen() {
   const canSubmit =
     form.name.trim().length > 0 &&
     [form.calories, form.protein, form.carbs, form.fat].every(
-      isValidMacroInput,
+      isValidMacroInput
     );
 
-  function updateField(field: keyof FoodForm, value: string) {
+  const updateField = (field: keyof FoodForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     setError(null);
     mutation.mutate({
       name: form.name.trim(),
@@ -83,7 +83,7 @@ export default function AddLogScreen() {
       fat: Number(form.fat),
       loggedAt: new Date().toISOString(),
     });
-  }
+  };
 
   if (isLoading) {
     return (
