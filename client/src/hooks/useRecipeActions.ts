@@ -6,7 +6,7 @@ import type {
   GenerateRecipeResponse,
   Recipe,
   SaveRecipeRequest,
-} from "../types/contracts";
+} from "@recipe-forge/contracts";
 
 export function useRecipeActions() {
   const generate = useCallback(

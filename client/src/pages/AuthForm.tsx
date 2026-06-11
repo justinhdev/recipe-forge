@@ -2,7 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import type { FormEvent } from "react";
-import type { LoginUserRequest, RegisterUserRequest } from "../types/contracts";
+import type {
+  LoginUserRequest,
+  RegisterUserRequest,
+} from "@recipe-forge/contracts";
 import api from "../utils/api";
 import { storeAuth } from "../utils/auth";
 import { Anvil } from "lucide-react";

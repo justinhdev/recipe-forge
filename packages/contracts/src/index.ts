@@ -1,5 +1,48 @@
-// TODO: client/src/types/contracts.ts should eventually migrate here.
-// Keep this package lightweight so the web client and future mobile app can share API shapes.
+// Shared API request/response shapes used by the web and mobile clients.
+
+export type RegisterUserRequest = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type LoginUserRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginUserResponse = {
+  token: string;
+  name: string;
+};
+
+export type Recipe = {
+  id?: number;
+  title: string;
+  ingredients: string[];
+  instructions: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  createdAt?: string;
+};
+
+export type GenerateOptions = {
+  servings: number;
+  diet: string;
+  cuisine: string;
+  mealType: string;
+  bravery: number;
+  macroPreference: string;
+};
+
+export type GenerateRecipeRequest = {
+  ingredients: string[];
+} & GenerateOptions;
+
+export type GenerateRecipeResponse = Recipe;
+export type SaveRecipeRequest = Recipe;
 
 export type FoodLog = {
   id: number;
@@ -42,16 +85,6 @@ export type CreateFoodLogResponse = FoodLog;
 export type ListFoodLogsResponse = FoodLog[];
 export type DeleteFoodLogResponse = {
   message: string;
-};
-
-export type LoginUserRequest = {
-  email: string;
-  password: string;
-};
-
-export type LoginUserResponse = {
-  token: string;
-  name: string;
 };
 
 export type GetDailyTargetResponse = DailyTarget | null;

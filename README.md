@@ -137,7 +137,7 @@ OPENAI_OUTPUT_COST_PER_1M=10.00
 - `server/src/schemas/` defines request, route param, recipe, and OpenAI response schemas.
 - `server/src/middleware/validate.middleware.ts` validates request bodies and params at the route layer.
 - `server/src/middleware/error.middleware.ts` returns consistent API errors and logs structured failures.
-- `client/src/types/contracts.ts` mirrors backend request and response contracts used by the frontend.
+- `packages/contracts` defines the API request and response types shared by the web and mobile clients.
 
 ## Mobile App (In Development)
 
@@ -157,7 +157,7 @@ npm install
 npm start
 ```
 
-The shared `packages/contracts` package is the long-term home for API contracts; `client/src/types/contracts.ts` still defines the web client's copy and will migrate over.
+Both the web client and the mobile app consume their API request/response types from the shared `packages/contracts` package, so contract changes propagate to every surface from one place.
 
 ## API Routes
 

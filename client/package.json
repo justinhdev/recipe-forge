@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@recipe-forge/contracts": "file:../packages/contracts",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
     "framer-motion": "^12.23.12",

@@ -1,1 +1,1 @@
-export type { GenerateOptions, Recipe } from "./contracts";
+export type { GenerateOptions, Recipe } from "@recipe-forge/contracts";
